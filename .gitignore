@@ -1,3 +1,11 @@
+# human_marl specific
+malmo/
+.DS_Store
+/shared_autonomy_deep_assist/
+test.py
+.vscode/
+swigwin/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
