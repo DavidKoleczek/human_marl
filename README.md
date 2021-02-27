@@ -1,7 +1,7 @@
 # Cooperative Multi Agent Reinforcement Learning with Human in the Loop
 
 # Code Structure
-* Main executable scripts are in the total level of `src`, start here!
+* Main executable scripts are in the top level of `src`, start here!
 * Other examples are in `src/examples`
 ```
 .
