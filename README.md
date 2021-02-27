@@ -13,7 +13,7 @@
 │   ├── environments/
 │   │   └── gridworld_environment.py
 │   ├── examples/
-│   │   └── gridworld_environment.py
+│   │   └── manual_gridworld.py
 │   ├── sharedautonomy/
 │   │   └── baseline.py
 │   ├── utils/
