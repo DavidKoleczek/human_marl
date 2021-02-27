@@ -3,7 +3,7 @@ from all.agents import Agent
 from all.environments import Environment
 
 
-def train_optimal_agent(agent: Agent, env: Environment) -> Agent:
+def train_optimal_agent_tabularq(agent: Agent, env: Environment) -> Agent:
     # training the tabular Q-Learning agent
     for _ in range(1000):
         env.reset()

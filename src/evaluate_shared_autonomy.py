@@ -2,7 +2,7 @@ import numpy as np
 
 from agents.qlearningtabular_agent import QLearningTabularAgent
 from environments.gridworld_environment import GridworldEnvironment
-from agents.train_agents import train_optimal_agent
+from agents.train_agents import train_optimal_agent_tabularq
 from utils.evaluate_policies import average_policy_returns
 from agents.humantabular_agent import HumanTabularAgent
 from sharedautonomy.baseline import evaluate_shared_autonomy_tabular
@@ -10,7 +10,7 @@ from sharedautonomy.baseline import evaluate_shared_autonomy_tabular
 env = GridworldEnvironment()
 agent = QLearningTabularAgent(action_space=list(range(4)), q_dims=(env._grid_dims[0] * env._grid_dims[1], 4))
 
-optimal_agent = train_optimal_agent(agent, env)
+optimal_agent = train_optimal_agent_tabularq(agent, env)
 optimal_return = average_policy_returns(agent, env)
 
 # make sure we actually trained a good policy for Gridworld, sometimes it diverges?
