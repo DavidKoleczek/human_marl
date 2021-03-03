@@ -9,7 +9,7 @@
 │   ├── agents/
 │   │   ├── humantabular_agent.py
 │   │   ├── qlearningtabular_agent.py
-│   │   └── train_agents.py             <- training "optimal" agents
+│   │   └── train_agents.py              <- training "optimal" agents
 │   ├── environments/
 │   │   └── gridworld_environment.py
 │   ├── examples/
@@ -18,10 +18,13 @@
 │   │   └── baseline.py
 │   ├── utils/
 │   │   └── evaluate_policies.py
-│   └── evaluate_shared_autonomy.py     <- baseline results for Shared Autonomy (Berkeley)
-└── .pep8                               <- adjusting autopep8 Python styling
+│   └── evaluate_shared_autonomy.py    <- baseline results for Shared Autonomy (Berkeley)
+│
+├── plots/                             <- store final plots showcasing results here
+│
+└── .pep8                              <- adjusting autopep8 Python styling
 ```
-[Link](https://tree.nathanfriend.io/?s=(%27optiKs!(%27fancy!true~fullPath!false~trailLSlash!true)~I(%27I%27Hsrc56Mhuman3qlearnL3traE_6s9D*4traEL%20%5C%27optimal%5C%27%206s0C2example2sFa75*JNutilMGpoliciesNGsF_a794J%20results%20for%20SF%20A7%20%7BBerkeley%7DH.pep8DDD*4adjustL%20autopep8%20PythK%20stylL0%27)~versiK!%271%27)*%20%200H*2Mgridworld_CN3tabular_6N*4**%3C-%205%2F06agent7utKomy9.pyCenvirKmentD****EinFharedGevaluate_H%5CnIsource!JbaselEeKonLEgMs5*N90%01NMLKJIHGFEDC97654320*) to update tree manually 
+[Link](https://tree.nathanfriend.io/?s=(%27optiNs!(%27fancy!true~fullPath!false~trailMSlash!true)~J(%27J%270srcR*7Uhuman4qlearnM4traD_7s6F*3traDT%5C%27optimal%5C%27%207s0*EUH_EKexampleUmanual_HKsGa95LKutilUIpoliciesKIsG_a9623LCfor%20SG%20A9%20%7BBerkeley%7D0plots%2FFF2%203stoQ%20fDal%20ploOshowcasMCheQ0.pep8FF2*3adjustTautopep8%20PythN%20stylM0%27)~versiN!%271%27)*%20%200%5Cn2**3%3C-%204tabular_76025R26.py7agent9utNomyC%20QsulODinEenvirNmentF222GhaQdHgridworldIevaluate_Jsource!K60*LbaselDeMDgNonOts%20QreR%2F0TM%20Us5%01UTRQONMLKJIHGFEDC97654320*) to update tree manually 
 
 
 
