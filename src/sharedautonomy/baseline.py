@@ -86,16 +86,18 @@ def shared_modified_tabular(optimal_agent: Agent, human_agent: Agent, env: Envir
         human_action = human_agent.eval(env.state)
         optimal_action = optimal_agent.eval(env.state)
 
-        # get q_values for each agent's action
+        # get q_values for the human's action
         q_vals = q_optimal[env.state['observation'].numpy()[0]]
         # subtract away the minimum q value to make them comparable if some are negative
         q_vals -= min(q_vals)
         q_val_human = q_vals[human_action]
-        q_val_optimal = q_vals[optimal_action]
+
+        # get J_star, which we assume to be the maximum initial-state q value
+        j_star = np.max(q_optimal[0])
 
         # deciding if we need to intervene, an interpretation of section 3.2.1 from previous work
         curr_gamma = math.pow(env._gamma, env._timestep)
-        if (curr_gamma * q_val_human) + returns >= (1 - alpha) * q_val_optimal * curr_gamma:
+        if (curr_gamma * q_val_human) + returns >= (1 - alpha) * j_star:
             action = human_action
         else:
             action = optimal_action
