@@ -20,6 +20,8 @@ agent = QLearningTabularAgent(action_space=list(range(4)), q_dims=(env._grid_dim
 
 optimal_agent = train_optimal_agent_tabularq(agent, env)
 optimal_return = average_policy_returns(optimal_agent, env)
+print(optimal_return)
+print("finish learning")
 
 # make sure we actually trained a good policy for Gridworld, sometimes it diverges?
 assert optimal_return > 3
@@ -51,6 +53,7 @@ def evaluate_helper(human_agent, plot_name, env, optimal_agent):
     intervention_history_mod = []
     returns_history_mod = []
     for alpha in range(1, 98):
+        print("alpha", alpha)
         # want alphas to be between 0 and 1
         alpha = alpha / 100
 

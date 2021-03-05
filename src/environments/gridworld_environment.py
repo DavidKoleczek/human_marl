@@ -5,6 +5,7 @@ import torch
 import numpy as np
 from all.environments import Environment
 from all.core import State
+from gym import spaces
 
 
 class GridworldEnvironment(Environment):
@@ -49,7 +50,7 @@ class GridworldEnvironment(Environment):
         self._water_states = water_states
 
         # fixed parameters
-        self._gamma = 0.9
+        self._gamma = 0.99
         # stochasticity
         self._prStay = 0.1
         self._prRotate = 0.05
@@ -97,6 +98,8 @@ class GridworldEnvironment(Environment):
             return state
 
         noise = np.random.uniform()
+        if torch.is_tensor(action):
+            action = action.item()
         if noise < self._prStay:  # do nothing
             return state
         elif noise < (self._prStay + self._prRotate):
@@ -206,7 +209,7 @@ class GridworldEnvironment(Environment):
         Space
             An object of type Space that represents possible actions the agent may take
         """
-        return np.arange(3)
+        return spaces.Discrete(4)
 
     def render(self, **kwargs):
         """
@@ -224,10 +227,12 @@ class GridworldEnvironment(Environment):
         """
         Create n copies of this environment.
         """
-        return None
+        return [GridworldEnvironment() for _ in range(n)]
 
     def device(self):
         """
         The torch device the environment lives on.
         """
-        return None
+        return self._device
+
+
