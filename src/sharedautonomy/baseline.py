@@ -35,14 +35,14 @@ def shared_autonomy_tabular(optimal_agent: Agent, human_agent: Agent, env: Envir
         optimal_action = optimal_agent.eval(env.state)
 
         # get q_values for each agent's action
-        q_vals = q_optimal[env.state['observation'].numpy()[0]]
+        q_vals = q_optimal[int(env.state['observation'].numpy()[0])]
         # subtract away the minimum q value to make them comparable if some are negative
         q_vals -= min(q_vals)
         q_val_human = q_vals[human_action]
         q_val_optimal = q_vals[optimal_action]
 
         # deciding if we need to intervene, equation 3 of Shared Autonomy without similarity function
-        if q_val_human > ((1 - alpha) * q_val_optimal):
+        if q_val_human >= ((1 - alpha) * q_val_optimal):
             action = human_action
         else:
             action = optimal_action
@@ -87,7 +87,7 @@ def shared_modified_tabular(optimal_agent: Agent, human_agent: Agent, env: Envir
         optimal_action = optimal_agent.eval(env.state)
 
         # get q_values for the human's action
-        q_vals = q_optimal[env.state['observation'].numpy()[0]]
+        q_vals = q_optimal[int(env.state['observation'].numpy()[0])]
         # subtract away the minimum q value to make them comparable if some are negative
         q_vals -= min(q_vals)
         q_val_human = q_vals[human_action]

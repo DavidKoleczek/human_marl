@@ -14,7 +14,7 @@ class HumanTabularAgent(Agent):
     def act(self, state: State) -> int:
         """Gets the action given the current state
         """
-        state = state['observation'].numpy()[0]
+        state = int(state['observation'].numpy()[0])
         return self._tabular_policy[state]
 
     def eval(self, state: State) -> int:
