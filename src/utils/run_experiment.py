@@ -1,5 +1,5 @@
-from .single_env_experiment import SingleEnvExperiment
-from .parallel_env_experiment import ParallelEnvExperiment
+from utils.single_env_experiment import SingleEnvExperiment
+from all.experiments.parallel_env_experiment import ParallelEnvExperiment
 
 
 def run_experiment(

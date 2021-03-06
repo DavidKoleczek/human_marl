@@ -140,5 +140,4 @@ dmypy.json
 test.*
 
 # runs
-run.*
 runs/

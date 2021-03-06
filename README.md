@@ -38,7 +38,6 @@
 * Installation of [ALL](https://github.com/cpnota/autonomous-learning-library) required a manual download of [swig](http://www.swig.org/download.html), adding the folder to path, and then `pip install autonomous-learning-library`
 * NOTE: `requirements.txt` not currently up to date
 * Recommended `pip install autopep8` for automatic code formatting and `pip install pylint` for code analysis
-* Need to override all\experiments\run_experiment.py and all\experiments\single_env_experiment.py with run_experiment.py and run_experiment.py
 
 
 ## Setup Malmö

@@ -1,7 +1,7 @@
 from timeit import default_timer as timer
 import numpy as np
-from .writer import ExperimentWriter
-from .experiment import Experiment
+from all.experiments.writer import ExperimentWriter
+from all.experiments.experiment import Experiment
 
 class SingleEnvExperiment(Experiment):
     '''An Experiment object for training and testing agents that interact with one environment at a time.'''
