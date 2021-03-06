@@ -20,6 +20,7 @@ agent = QLearningTabularAgent(action_space=list(range(4)), q_dims=(env._grid_dim
 
 optimal_agent = train_optimal_agent_tabularq(agent, env)
 optimal_return = average_policy_returns(optimal_agent, env)
+print('Estimated return of optimal policy: {}'.format(optimal_return))
 
 # make sure we actually trained a good policy for Gridworld, sometimes it diverges?
 assert optimal_return > 3

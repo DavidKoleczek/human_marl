@@ -43,7 +43,7 @@ class QLearningTabularAgent(Agent):
         Returns:
             int: the next action
         """
-        state = state['observation'].numpy()[0]
+        state = int(state['observation'].numpy()[0])
         epsilon = random.uniform(0, 1)
         if epsilon > self._epsilon:
             # choose one of the actions with the highest Q-values (breaking ties between maximum Q values)
@@ -57,9 +57,9 @@ class QLearningTabularAgent(Agent):
     def act(self, state: State, action: int, next_state: State) -> int:
         """Performs one training step and returns the next action
         """
-        state = state['observation'].numpy()[0]
+        state = int(state['observation'].numpy()[0])
         reward = next_state['reward']
-        next_state = next_state['observation'].numpy()[0]
+        next_state = int(next_state['observation'].numpy()[0])
 
         # q-learning update
         next_action = np.argmax(self.Q[next_state])
@@ -72,5 +72,5 @@ class QLearningTabularAgent(Agent):
         """Chooses an action using the current policy (Q function) of the agent
         """
         # always choose the greedy action when evaluating
-        state = state['observation'].numpy()[0]
+        state = int(state['observation'].numpy()[0])
         return np.random.choice(np.flatnonzero(self.Q[state] == self.Q[state].max()))

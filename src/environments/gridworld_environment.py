@@ -5,11 +5,11 @@ import torch
 import numpy as np
 from all.environments import Environment
 from all.core import State
-from gym import spaces
+from gym.spaces import Space, Discrete
 
 
 class GridworldEnvironment(Environment):
-    def __init__(self, grid_dims: Tuple[int, int] = (5, 5), start_state: int = 0, end_states: List[int] = [24], obstacle_states: List[int] = [12, 17], water_states: List[int] = [22]):
+    def __init__(self, grid_dims: Tuple[int, int] = (5, 5), start_state: float = 0.0, end_states: List[float] = [24.0], obstacle_states: List[float] = [12.0, 17.0], water_states: List[float] = [22.0]):
         """
         The Gridworld as described in the lecture notes of the 687 course material.
         Found here https://people.cs.umass.edu/~pthomas/courses/CMPSCI_687_Fall2020/687_F20.pdf
@@ -88,7 +88,7 @@ class GridworldEnvironment(Environment):
         self._timestep = 0
         self._done = False
 
-    def _calc_next_state(self, state: int, action: int) -> int:
+    def _calc_next_state(self, state: float, action: int) -> float:
         """Calculates the next state given the current state, action, and environment dynamics
 
         Returns:
@@ -176,7 +176,7 @@ class GridworldEnvironment(Environment):
         return self._state
 
     @property
-    def state_space(self) -> np.ndarray:
+    def state_space(self) -> Space:
         """
         The Space representing the range of observable states.
 
@@ -185,10 +185,10 @@ class GridworldEnvironment(Environment):
         Space
             An object of type Space that represents possible states the agent may observe
         """
-        return np.arange(self._grid_dims[0] * self._grid_dims[1])
+        return Discrete(self._grid_dims[0] * self._grid_dims[1])
 
     @property
-    def observation_space(self) -> np.ndarray:
+    def observation_space(self) -> Space:
         """
         Alias for Environemnt.state_space.
 
@@ -197,10 +197,10 @@ class GridworldEnvironment(Environment):
         Space
             An object of type Space that represents possible states the agent may observe
         """
-        return np.arange(self._grid_dims[0] * self._grid_dims[1])
+        return Discrete(self._grid_dims[0] * self._grid_dims[1])
 
     @property
-    def action_space(self) -> np.ndarray:
+    def action_space(self) -> Space:
         """
         The Space representing the range of possible actions.
 
@@ -209,7 +209,7 @@ class GridworldEnvironment(Environment):
         Space
             An object of type Space that represents possible actions the agent may take
         """
-        return spaces.Discrete(4)
+        return Discrete(4)
 
     def render(self, **kwargs):
         """
