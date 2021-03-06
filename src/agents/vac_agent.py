@@ -1,11 +1,9 @@
 from torch.optim import Adam
-#from agents.vac import VAC
 from all.approximation import VNetwork, FeatureNetwork
 from all.bodies import DeepmindAtariBody
 from all.logging import DummyWriter
 from all.policies import SoftmaxPolicy
-#from models import nature_features, nature_value_head, nature_policy_head
-from models import simple_nature_features, simple_nature_value_head, simple_nature_policy_head
+from models.models import simple_nature_features, simple_nature_value_head, simple_nature_policy_head
 
 from torch.nn.functional import mse_loss
 from all.agents._agent import Agent
@@ -28,6 +26,7 @@ class VAC(Agent):
         n_steps (int): Number of timesteps per rollout. Updates are performed once per rollout.
         writer (Writer): Used for logging.
     '''
+
     def __init__(self, features, v, policy, discount_factor=1):
         self.features = features
         self.v = v
@@ -64,7 +63,6 @@ class VAC(Agent):
             self.v.reinforce(value_loss)
             self.policy.reinforce(policy_loss)
             self.features.reinforce()
-
 
 
 def VAC_agent(
@@ -121,7 +119,7 @@ def VAC_agent(
             writer=writer,
         )
         policy = SoftmaxPolicy(
-            policy_model,                                                                                
+            policy_model,
             policy_optimizer,
             clip_grad=clip_grad,
             writer=writer,
@@ -134,8 +132,7 @@ def VAC_agent(
         )
 
         return VAC(features, v, policy, discount_factor=discount_factor)
-    #SingleEnvExperiment
+    # SingleEnvExperiment
     return _vac
-    #ParallelEnvExperiment 
-    #return _vac, n_envs
-    
+    # ParallelEnvExperiment
+    # return _vac, n_envs
