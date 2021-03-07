@@ -1,0 +1,16 @@
+# Example file: https://gist.github.com/sblask/7302860
+
+[BASIC]
+# Include a hint for the correct naming format with invalid-name.
+include-naming-hint=no
+
+[FORMAT]
+max-line-length=140
+
+[TYPECHECK]
+generated-members=numpy.* ,torch.*
+
+[MISCELLANEOUS]
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,
+      XXX
