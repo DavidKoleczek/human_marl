@@ -1,4 +1,5 @@
 """ Human in the loop wrapper for GymEnvironments """
+import gym
 import torch
 
 from all.environments.gym import GymEnvironment
@@ -42,3 +43,29 @@ class HITLGymEnvironment(GymEnvironment):
     @property
     def state(self):
         return super().state
+
+    @property
+    def theta_size(self) -> int:
+        """Gets the number of parameters of this env's state space which will determine
+        the input of the PolicyNetwork.
+
+        Returns:
+            int: number of parameters of this env's state space
+        """
+        total_size = 0
+        for s in self.observation_space.shape:
+            total_size += s
+        return total_size
+
+    @property
+    def num_actions(self) -> int:
+        """get the number of actions for use in the Policy Network
+
+        Returns:
+            int: number of actions
+        """
+        # check if the gym has a discrete state space
+        if isinstance(self.action_space, gym.spaces.Discrete):
+            return self.action_space.n
+
+        raise ValueError('ES Agent currently only supports Discrete action spaces.')

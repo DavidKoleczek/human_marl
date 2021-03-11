@@ -1,20 +1,33 @@
 import gym
 import torch
+import torch.nn as nn
+
 from all.agents import Agent
 
 
-class PolicyNetwork(torch.nn.Module):
-    def __init__(self, num_actions):
+class SimplePolicyNetwork(nn.Module):
+    def __init__(self, theta_size: int, num_actions: int):
         super().__init__()
-        # 8 is just hardcoding the network size for now, which is the same as the lunar lander state
-        self.linear = torch.nn.Linear(8, num_actions)
+        self.linear1 = nn.Linear(theta_size, 64)
+        self.linear2 = nn.Linear(64, 64)
+        self.actor_linear = nn.Linear(64, num_actions)
 
-    def forward(self, theta):
-        outputs = self.linear(theta)
+        # unsure why the reference implementation had this
+        self.train()
+
+    def forward(self, theta) -> torch.tensor:
+        x = nn.SELU()(self.linear1(theta))
+        x = nn.SELU()(self.linear2(x))
+        outputs = self.actor_linear(x)
 
         # softmax action selection
         probs = torch.nn.functional.softmax(outputs, dim=-1)
         return torch.argmax(probs, dim=-1)
+
+    def get_params(self):
+        """ The network parameters that should be trained by ES (which is all of them)
+        """
+        return [(k, v) for k, v in zip(self.state_dict().keys(), self.state_dict().values())]
 
 
 class EvolutionStrategyAgent(Agent):
@@ -24,14 +37,8 @@ class EvolutionStrategyAgent(Agent):
         :
     """
 
-    def __init__(self, action_space: gym.spaces.Space):
-        # get the number of actions for the Policy Network
-        if isinstance(action_space, gym.spaces.Discrete):
-            self.num_actions = action_space.n
-        else:
-            raise ValueError('ES Agent currently only supports Discrete action spaces.')
-
-        self.policy = PolicyNetwork(self.num_actions)
+    def __init__(self, theta_size: int, num_actions: int):
+        self.policy = SimplePolicyNetwork(theta_size, num_actions)
 
     def act(self, state):
         """
