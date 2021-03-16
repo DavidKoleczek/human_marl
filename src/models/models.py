@@ -122,3 +122,12 @@ def simple_nature_value_head():
 
 def simple_nature_policy_head(env):
     return nn.Linear0(16, env.action_space.n)
+
+def lunar_lander_nature_ddqn(env):
+    return nn.Sequential(
+        nn.Linear(env.observation_space.shape[0], 64),
+        nn.ReLU(),
+        nn.Linear(64, 64),
+        nn.ReLU(),
+        nn.Linear(64, env.action_space.n),
+    )

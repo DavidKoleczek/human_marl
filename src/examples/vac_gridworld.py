@@ -25,4 +25,4 @@ frames = 20000
 max_steps = 200
 
 agent = VAC_agent(device = "cpu", clip_grad = 1, value_loss_scaling = 1)
-run_experiment(agent, env, frames=frames, max_steps=max_steps)
+run_experiment(agent, env, frames=frames)
