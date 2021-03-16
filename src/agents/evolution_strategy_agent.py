@@ -8,9 +8,9 @@ from all.agents import Agent
 class SimplePolicyNetwork(nn.Module):
     def __init__(self, theta_size: int, num_actions: int):
         super().__init__()
-        self.linear1 = nn.Linear(theta_size, 64)
-        self.linear2 = nn.Linear(64, 64)
-        self.actor_linear = nn.Linear(64, num_actions)
+        self.linear1 = nn.Linear(theta_size, 32)
+        self.linear2 = nn.Linear(32, 32)
+        self.actor_linear = nn.Linear(32, num_actions)
 
         # unsure why the reference implementation had this
         self.train()

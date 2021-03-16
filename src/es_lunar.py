@@ -45,10 +45,10 @@ def fitness_shaping(returns):
 TRAIN_ITERATIONS = 10000
 # hyperparameter in evolution strategies which controls the number of "mutations" per training timestep
 # note that this will technically result in a population twice the value because we consider the antithesis for each perturbation
-POPULATION_SIZE = 20
+POPULATION_SIZE = 40
 # hyperparameter, noise standard deviation
-SIGMA = 0.03
-LEARNING_RATE = 0.05
+SIGMA = 0.05
+LEARNING_RATE = 0.1
 LEARNING_RATE_DECAY = 0.999
 
 N = POPULATION_SIZE * 2

@@ -32,7 +32,9 @@ class HITLGymEnvironment(GymEnvironment):
         Returns:
             [type]: [description]
         """
-        return super().step(action)
+        state = super().step(action)
+        state['reward'] = torch.tensor(state['reward'])
+        return state
 
     # TODO
     @property
@@ -42,7 +44,8 @@ class HITLGymEnvironment(GymEnvironment):
     # TODO
     @property
     def state(self):
-        return super().state
+        state = super().state
+        return state
 
     @property
     def theta_size(self) -> int:
