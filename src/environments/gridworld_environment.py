@@ -7,6 +7,7 @@ from all.environments import Environment
 from all.core import State
 from gym.spaces import Space, Discrete
 
+MAX_NUM_STEPS = 200
 
 class GridworldEnvironment(Environment):
     def __init__(self, grid_dims: Tuple[int, int] = (5, 5), start_state: float = 0.0, end_states: List[float] = [24.0], obstacle_states: List[float] = [12.0, 17.0], water_states: List[float] = [22.0]):
@@ -156,9 +157,11 @@ class GridworldEnvironment(Environment):
         reward = self._calc_reward(next_state)
 
         self._reward = reward
-        self._done = next_state in self._end_states
         self._timestep += 1
 
+        timeout = self._timestep >= MAX_NUM_STEPS
+        self._done = next_state in self._end_states or timeout
+        
         state_obj = State({
             'observation': torch.tensor([next_state]),  # pylint: disable=not-callable
             'reward': reward,
