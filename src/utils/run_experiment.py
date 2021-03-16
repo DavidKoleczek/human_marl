@@ -11,7 +11,6 @@ def run_experiment(
         render=False,
         test_episodes=100,
         write_loss=True,
-        max_steps = 200
 ):
     if not isinstance(agents, list):
         agents = [agents]
@@ -28,8 +27,7 @@ def run_experiment(
                 logdir=logdir,
                 quiet=quiet,
                 render=render,
-                write_loss=write_loss,
-                max_steps=max_steps
+                write_loss=write_loss
             )
             experiment.train(frames=frames)
             experiment.test(episodes=test_episodes)

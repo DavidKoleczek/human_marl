@@ -12,8 +12,7 @@ class SingleEnvExperiment(Experiment):
             logdir='runs',
             quiet=False,
             render=False,
-            write_loss=True,
-            max_steps = 200
+            write_loss=True
     ):
         super().__init__(self._make_writer(logdir, agent.__name__, env.name, write_loss), quiet)
         self._agent = agent(env, self._writer)
@@ -21,7 +20,6 @@ class SingleEnvExperiment(Experiment):
         self._render = render
         self._frame = 1
         self._episode = 1
-        self._max_steps = max_steps
 
         if render:
             self._env.render(mode="human")
@@ -58,7 +56,6 @@ class SingleEnvExperiment(Experiment):
         action = self._agent.act(state)
         returns = 0
 
-        steps = 0
         # loop until the episode is finished
         while not state['done']:
             if self._render:
@@ -67,10 +64,6 @@ class SingleEnvExperiment(Experiment):
             action = self._agent.act(state)
             returns += state['reward']
             self._frame += 1
-            steps += 1
-            if steps >= self._max_steps:
-                break
-            
 
         # stop the timer
         end_time = timer()
@@ -89,7 +82,6 @@ class SingleEnvExperiment(Experiment):
         action = self._agent.eval(state)
         returns = 0
 
-        steps = 0
         # loop until the episode is finished
         while not state['done']:
             if self._render:
@@ -97,9 +89,6 @@ class SingleEnvExperiment(Experiment):
             state = self._env.step(action)
             action = self._agent.act(state)
             returns += state['reward']
-            steps += 1
-            if steps >= self._max_steps:
-                break
 
         return returns
 
@@ -108,3 +97,10 @@ class SingleEnvExperiment(Experiment):
 
     def _make_writer(self, logdir, agent_name, env_name, write_loss):
         return ExperimentWriter(self, agent_name, env_name, loss=write_loss, logdir=logdir)
+
+    def show(self):
+        render = self._render
+        self._render = True
+        self._run_test_episode()
+        self._env.close()
+        self._render = render
