@@ -47,7 +47,6 @@ class LaggyPilotPolicyAgent(object):
     def __init__(self, agent: Agent, lag_prob=0.8):
         self.agent = agent
         self.lag_prob = lag_prob
-
         self.last_laggy_pilot_act = None
 
     def eval(self, state):

@@ -48,6 +48,7 @@ class GridworldEnvironment(Environment):
                 +10 for entering the goal state
                 0 everywhere else
         """
+
         # customizable parameters
         self._grid_dims = grid_dims
         self._start_state = self._one_hot_state(start_state)
@@ -80,7 +81,7 @@ class GridworldEnvironment(Environment):
         """
         return 'gridworld_cs687_v0'
 
-    def reset(self) -> State:
+    def reset(self) -> None:
         """
         Reset the environment and return a new intial state.
 
@@ -154,8 +155,8 @@ class GridworldEnvironment(Environment):
         return one_hot_state
 
     def _un_one_hot_state(self, state: torch.tensor) -> int:
-        # the first grid_dims * grid_dims elements of state correspond to Gridworld
-        state = torch.index_select(state, 0, torch.tensor(list(range(self._grid_dims[0] * self._grid_dims[1]))))
+        # only the first grid_dims[0] * grid_dims[1] states correspond to the coordinates
+        state = state.narrow(0, 0, (self._grid_dims[0] * self._grid_dims[1]))
         state = torch.argmax(state).numpy()
         state = int(state)
         return state
@@ -261,7 +262,7 @@ class GridworldEnvironment(Environment):
         Space
             An object of type Space that represents possible actions the agent may take
         """
-        return Discrete(4)
+        return Discrete(8)
 
     def render(self, **kwargs):
         """

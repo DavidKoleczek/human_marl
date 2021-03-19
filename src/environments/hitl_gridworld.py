@@ -15,15 +15,18 @@ class HITLGridworldEnvironment(GridworldEnvironment):
     """ Human in the loop wrapper for GymEnvironments
     """
 
-    def __init__(self, human: Agent):
+    def __init__(self, human: Agent, intervention_penalty: float = 0.1):
         """Initializes a human in the loop wrapper around a GymEnvironment
 
         Args:
-            human (TODO): TODO human should be a simulated agent that given the current state of the GymEnvironment will return some action
+            human (Agent):  human should be a simulated agent that given the current state of the GymEnvironment will return some action
             device (str, optional): Defaults to torch.device('cpu').
         """
         super().__init__()
         self.human = human
+        self.intervention_penalty = intervention_penalty
+        self.interventions_made = 0
+        self.unmodified_return = 0
 
     def reset(self) -> State:
         """
@@ -44,7 +47,25 @@ class HITLGridworldEnvironment(GridworldEnvironment):
         self._action = None
         self._timestep = 0
         self._done = False
+        self.interventions_made = 0
+        self.unmodified_return = 0
         return self._state
+
+    def _remove_human_action(self, state: State) -> State:
+        """ Removes the human action from the observation in the given State object
+
+        Args:
+            state (State): State object
+
+        Returns:
+            State: State object without the human action as part of the observation
+        """
+        modified_state = deepcopy(state)
+        modified_state['observation'] = modified_state['observation'][:-1]
+        return modified_state
+
+    def _intervention_penalty(self) -> float:
+        return self.intervention_penalty
 
     def step(self, action) -> State:
         """Overrides GymEnvironment's step method. Returns the state of the gym environment + the human's action.
@@ -56,16 +77,25 @@ class HITLGridworldEnvironment(GridworldEnvironment):
         Returns:
             [type]: [description]
         """
-        # TODO: Modify reward
-        # TODO: Add noop to agent
-        state = super().step(action)
-        human_action = self.human.eval(state)
-        state['observation'] = torch.cat((state['observation'], torch.tensor([human_action])), 0)
-        return state
 
-    @property
-    def state(self):
-        return self._state
+        # get the human's action
+        human_action = self.human.eval(self._remove_human_action(self.state))
+
+        # if the agent did not the take noop action use its action
+        # and treat it as an interventions
+        if action != 8:
+            next_state = super().step(action)
+            self.unmodified_return += float(next_state['reward'])
+            next_state['reward'] -= self._intervention_penalty()
+            self.interventions_made += 1
+        # otherwise, use the human action
+        else:
+            next_state = super().step(human_action)
+            self.unmodified_return += float(next_state['reward'])
+
+        # concat state with the human's action
+        next_state['observation'] = torch.cat((next_state['observation'], torch.tensor([human_action])), 0)
+        return next_state
 
     @property
     def state_space(self) -> Space:
@@ -77,9 +107,12 @@ class HITLGridworldEnvironment(GridworldEnvironment):
         Space
             An object of type Space that represents possible states the agent may observe
         """
+        # add 1 to the size of the state space to accomodate the human's action
         shape = (self._grid_dims[0] * self._grid_dims[1]) + 1
         low = np.zeros(shape=shape, dtype=np.float32)
         high = np.ones(shape=shape, dtype=np.float32)
+        # the upperbound on the human's action is the number of actions
+        high[-1] = self.num_actions - 1
         return Box(low=low, high=high, shape=(shape, ), dtype=np.float32)
 
     @property
@@ -92,20 +125,50 @@ class HITLGridworldEnvironment(GridworldEnvironment):
         Space
             An object of type Space that represents possible states the agent may observe
         """
-        shape = (self._grid_dims[0] * self._grid_dims[1]) + 1
-        low = np.zeros(shape=shape, dtype=np.float32)
-        high = np.ones(shape=shape, dtype=np.float32)
-        return Box(low=low, high=high, shape=(shape, ), dtype=np.float32)
+
+        return self.state_space
+
+    @property
+    def action_space(self) -> Space:
+        """
+        The Space representing the range of possible actions.
+
+        Returns
+        -------
+        Space
+            An object of type Space that represents possible actions the agent may take
+        """
+        # add 1 to the action space to accomdate the noop action
+        return Discrete(8 + 1)
 
     @property
     def num_actions(self) -> int:
-        """get the number of actions for use in the Policy Network
+        """Get the number of actions for use in the Policy Network
 
         Returns:
             int: number of actions
         """
         # check if the gym has a discrete state space
+        # add 1 to the action space to accomdate the noop action
         if isinstance(self.action_space, gym.spaces.Discrete):
-            return self.action_space.n
+            return self.action_space.n + 1
 
         raise ValueError('ES Agent currently only supports Discrete action spaces.')
+
+    @property
+    def get_interventions_made(self) -> int:
+        """Get a count of interventions in this environment since the last reset.
+
+        Returns:
+            int: number of interventions
+        """
+        return self.interventions_made
+
+    @property
+    def get_unmodified_return(self) -> float:
+        """Get the environment returns without considering the intervention penalty that was added
+
+        Returns:
+            float: environment returns
+        """
+        return self.unmodified_return
