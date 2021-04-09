@@ -11,7 +11,7 @@ from easyrl.core import State
 from easyrl.agents import Agent
 
 
-class HITLGridworldEnvironment(GridworldEnvironment):
+class HITLBudgetGridworldEnvironment(GridworldEnvironment):
     """ Human in the loop wrapper for GymEnvironments
     """
 
