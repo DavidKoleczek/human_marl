@@ -5,8 +5,8 @@ import torch
 import numpy as np
 from gym.spaces import Space, Box, Discrete
 
-from easyrl.core import State
-from .environment import Environment
+from ._state import State
+from ._environment import Environment
 
 
 class GridworldEnvironment(Environment):
@@ -155,8 +155,6 @@ class GridworldEnvironment(Environment):
         return one_hot_state
 
     def _un_one_hot_state(self, state: torch.tensor) -> int:
-        # only the first grid_dims[0] * grid_dims[1] states correspond to the coordinates
-        state = state.narrow(0, 0, (self._grid_dims[0] * self._grid_dims[1]))
         state = torch.argmax(state).numpy()
         state = int(state)
         return state

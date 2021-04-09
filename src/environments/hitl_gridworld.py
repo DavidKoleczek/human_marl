@@ -7,7 +7,7 @@ import numpy as np
 from gym.spaces import Space, Box, Discrete
 
 from easyrl.environments import GridworldEnvironment
-from easyrl.core import State
+from easyrl.environments import State
 from easyrl.agents import Agent
 
 
