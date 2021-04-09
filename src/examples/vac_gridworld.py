@@ -19,10 +19,10 @@ from environments.gridworld_environment import GridworldEnvironment  # pylint: d
 
 from utils.run_experiment import run_experiment
 
-env = GridworldEnvironment(grid_dims = (3, 3), start_state = 0, end_states = [8], obstacle_states = [], water_states = [3])
+env = GridworldEnvironment(grid_dims=(3, 3), start_state=0, end_states=[8], obstacle_states=[], water_states=[3])
 #env = GridworldEnvironment(grid_dims = (5, 5), start_state = 0, end_states = [24], obstacle_states = [12, 17], water_states = [22])
 frames = 20000
 max_steps = 200
 
-agent = VAC_agent(device = "cpu", clip_grad = 1, value_loss_scaling = 1)
+agent = VAC_agent(device="cpu", clip_grad=1, value_loss_scaling=1)
 run_experiment(agent, env, frames=frames)

@@ -1,7 +1,9 @@
 import gym
 import torch
-from easyrl.core import State
-from .environment import Environment
+
+from ._state import State
+from ._environment import Environment
+
 gym.logger.set_level(40)
 
 
