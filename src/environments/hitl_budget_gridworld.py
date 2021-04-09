@@ -7,7 +7,7 @@ import numpy as np
 from gym.spaces import Space, Box, Discrete
 
 from easyrl.environments import GridworldEnvironment
-from easyrl.core import State
+from easyrl.environments import State
 from easyrl.agents import Agent
 
 
@@ -15,7 +15,7 @@ class HITLBudgetGridworldEnvironment(GridworldEnvironment):
     """ Human in the loop wrapper for GymEnvironments
     """
 
-    def __init__(self, human: Agent, intervention_penalty: float = 0.1, budget = 50):
+    def __init__(self, human: Agent, intervention_penalty: float = 0.1, budget=50):
         """Initializes a human in the loop wrapper around a GymEnvironment
 
         Args:
@@ -98,7 +98,8 @@ class HITLBudgetGridworldEnvironment(GridworldEnvironment):
             self.unmodified_return += float(next_state['reward'])
 
         # concat state with the human's action, and remaining budget
-        next_state['observation'] = torch.cat((next_state['observation'], torch.tensor([human_action]), torch.tensor([self.remaining_budget])), 0)
+        next_state['observation'] = torch.cat((next_state['observation'], torch.tensor(
+            [human_action]), torch.tensor([self.remaining_budget])), 0)
         return next_state
 
     @property
