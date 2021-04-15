@@ -1,7 +1,8 @@
-''' A environment for training a human in the loop agent on LunarLanderContinuous
+'''An environment for evaluating a trained agent with an actual human in the loop on LunarLanderContinuous
 
 Follows the OpenAI Gym Environment Interface: https://github.com/openai/gym/blob/151ba406ebf07c5274c99542549aaacd6f70ba24/gym/core.py#L8
 '''
+
 from copy import deepcopy
 
 import numpy as np
@@ -9,14 +10,13 @@ import gym
 from gym import spaces
 
 
-class HITLSBLunarLanderCont(gym.Env):
+class HITLSBLunarLanderContEval(gym.Env):
     """Custom Environment that follows gym interface"""
 
-    def __init__(self, env_name, human, intervention_penalty=0):
+    def __init__(self, env_name, hitl_agent):
         self.env = gym.make(env_name)
-        self.human = human
+        self.hitl_agent = hitl_agent
         self.state = None
-        self.intervention_penalty = intervention_penalty
 
         # logging variables
         self.interventions_made = 0
@@ -27,7 +27,7 @@ class HITLSBLunarLanderCont(gym.Env):
 
     @property
     def action_space(self):
-        # one new action to be the no-op
+        # one new action as a no-op
         new_shape = self.env.action_space.shape
         new_shape = (new_shape[0] + 1, )
 
@@ -60,39 +60,62 @@ class HITLSBLunarLanderCont(gym.Env):
         modified_state = modified_state[:-3]
         return modified_state
 
+    def _continuize_action(self, discrete_action):
+        """A human's inputs are assumed to be discrete, so in order to use them
+        in the trained SAC HITL agent, we make them "continuous".
+
+        Args:
+            discrete_action (np.ndarray):
+
+        Returns:
+            np.ndarray:
+        """
+        # no-op
+        if discrete_action == 0:
+            return np.array([0, 0, -1])
+        # left engine
+        elif discrete_action == 1:
+            return np.array([0, -1, -1])
+        # main engine
+        elif discrete_action == 2:
+            return np.array([1, 0, -1])
+        # right engine
+        elif discrete_action == 3:
+            return np.array([0, 1, -1])
+        # just in case
+        else:
+            return np.array([0, 0, -1])
+
     def step(self, action):
         self.timesteps = self.env._elapsed_steps  # logging
 
-        # get the human's action.
-        # handle if we are on the 0th timestep or not because the first state has a different form
-        # it has just the observation; no "reward", "done", or "info" which is why this if else exists
+        # take the discrete human action and make it continuous
+        human_action = self._continuize_action(action)
+
+        # the difference between these if else clauses is that we need to handle the first timestep having a different format
         if self.env._elapsed_steps > 0:
-            human_action = self.human.predict(self._get_unmodified_state(self.state[0]))
+            # for use with the HITL agent, we add the human's action to the underlying environment's state
+            curr_state = np.concatenate((self.state[0][0: -self.action_space.shape[0]], human_action))
+            # get the HITL agent's action
+            hitl_action = self.hitl_agent.predict(curr_state)[0]
         else:
-            human_action = self.human.predict(self._get_unmodified_state(self.state))
+            # same idea as the if clause
+            curr_state = np.concatenate((self.state[0: -self.action_space.shape[0]], human_action))
+            hitl_action = self.hitl_agent.predict(curr_state)[0]
 
-        # if the agent took the noop action (last value of action is less than or equal to 0), use the human action
-        # otherwise penalize the agent, but take its action
-        penalty = 0
-        if action[-1] <= 0:
-            action = human_action[0]  # indexing at 0 because the human action is wrapped in a tuple
-            action = np.concatenate((action, np.array([-1])))  # -1 is basically adding to the state that an intervention was made
-        else:
-            penalty = self.intervention_penalty
-            self.non_noops_taken += 1  # logging
-            self.interventions_made += 1  # logging
+        # assume that the last element in the agent's action vector is what determines if it want's to take a no-op
+        # if that element is less than 0, then it took a no-op, so we use the human's action
+        if hitl_action[-1] < 0:
+            hitl_action = human_action
 
-        state = self.env.step(action)
+        state = self.env.step(hitl_action)
         self.raw_reward += state[1]  # logging
 
         # modifies the underlying environment's state in order to add the
         # current action to the observation and also add the intervention penalty
         temp = list(state)
-        temp[0] = np.concatenate((state[0], action))
-        temp[1] -= penalty
+        temp[0] = np.concatenate((state[0], hitl_action))
         state = tuple(temp)
-
-        self.modified_reward += temp[1]  # logging
 
         self.state = state
         return self.state
@@ -107,10 +130,9 @@ class HITLSBLunarLanderCont(gym.Env):
 
         # keep track of the state so we can provide it to the "human"
         self.state = self.env.reset()
-        human_action = self.human.predict(self.state)[0]
 
-        # the initial state will use the first human actio and assume no intervention was made
-        self.state = np.concatenate((self.state, human_action, np.array([-1])))
+        # the initial state will not take any action
+        self.state = np.concatenate((self.state, np.array([0, 0, -1])))
 
         return self.state
 

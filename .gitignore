@@ -7,7 +7,6 @@ test.py
 swigwin/
 results_base.csv
 results_old.csv
-sac_lunar.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,7 +1,9 @@
+'''Runs a series of experiments over various different parameters, see main function for more details.
+'''
+
 import csv
 from multiprocessing import Pool
 
-import gym
 from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 
