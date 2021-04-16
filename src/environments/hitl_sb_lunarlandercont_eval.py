@@ -105,7 +105,9 @@ class HITLSBLunarLanderContEval(gym.Env):
 
         # assume that the last element in the agent's action vector is what determines if it want's to take a no-op
         # if that element is less than 0, then it took a no-op, so we use the human's action
+        did_intervene = True
         if hitl_action[-1] < 0:
+            did_intervene = False
             hitl_action = human_action
 
         state = self.env.step(hitl_action)
@@ -116,6 +118,7 @@ class HITLSBLunarLanderContEval(gym.Env):
         temp = list(state)
         temp[0] = np.concatenate((state[0], hitl_action))
         state = tuple(temp)
+        temp[3]['did_intervene'] = did_intervene
 
         self.state = state
         return self.state

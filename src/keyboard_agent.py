@@ -33,6 +33,16 @@ def display_arr(screen, arr, video_size, transpose):
     screen.blit(pyg_img, (0, 0))
 
 
+def _add_intervention_marker(display_pixels):
+    x_axis = list(range(500, 530))
+    y_axis = list(range(50, 80))
+    for x in x_axis:
+        for y in y_axis:
+            display_pixels[y][x] = (255, 30, 30)
+
+    return display_pixels
+
+
 def play(env, transpose=True, fps=30, zoom=None, callback=None, keys_to_action=None):
     """Allows one to play the game using keyboard.
     To simply play the game use:
@@ -101,6 +111,7 @@ def play(env, transpose=True, fps=30, zoom=None, callback=None, keys_to_action=N
         if env_done:
             env_done = False
             obs = env.reset()
+            info = {}
         else:
             action = keys_to_action.get(tuple(sorted(pressed_keys)), 0)
             prev_obs = obs
@@ -110,6 +121,8 @@ def play(env, transpose=True, fps=30, zoom=None, callback=None, keys_to_action=N
         if obs is not None:
             # TODO: If we make an interventions, flash that onto the screen by modifying the raw pixels.
             rendered = env.render(mode='rgb_array')
+            if info and info['did_intervene']:
+                rendered = _add_intervention_marker(rendered)
             display_arr(screen, rendered, transpose=transpose, video_size=video_size)
 
         # process pygame events
