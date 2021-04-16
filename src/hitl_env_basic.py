@@ -4,13 +4,14 @@ import numpy as np
 import pandas as pd
 
 from easyrl.environments import GridworldEnvironment
-from easyrl.agents import vac_preset
+from easyrl.presets.classic_control import vac_preset
 from easyrl.train.single_env_experiment import SingleEnvExperiment
 from easyrl.utils import average_policy_returns
 from utils.evaluate_policies import average_policy_returns_hitl
 from utils.misc import std_error
 from agents.lunar_lander_simulated_agent import LaggyPilotPolicyAgent
 from environments.hitl_gridworld import HITLGridworldEnvironment
+from environments.hitl_budget_gridworld import HITLBudgetGridworldEnvironment
 
 
 env = GridworldEnvironment()
@@ -19,12 +20,14 @@ env = GridworldEnvironment()
 # first train an optimal agent using Vanilla Actor-Critic (VAC)
 # keep trying VAC training until we get a good agent, sometimes it does not converge
 human_performance = 0  # how good our fake agent does on the regular environment
-while human_performance < 3:
-    fake_human_agent = vac_preset(env)
-    trainer = SingleEnvExperiment(fake_human_agent, env, quiet=True)
-    trainer.train(episodes=600)
-    human_performance = average_policy_returns(fake_human_agent, env, num_episodes=100)
-    print('Fake human policy, no lag, average performance (reward): ', human_performance)
+# while human_performance < 3:
+fake_human_agent = vac_preset(env)
+trainer = SingleEnvExperiment(fake_human_agent, env, quiet=True)
+#600
+trainer.train(episodes=1)
+#100
+human_performance = average_policy_returns(fake_human_agent, env, num_episodes=1)
+print('Fake human policy, no lag, average performance (reward): ', human_performance)
 
 # wrap the optimal agent with a LaggyPilotPolicy agent, which lag_prob of the time selects the previous action
 fake_human_agent = LaggyPilotPolicyAgent(fake_human_agent, lag_prob=0.75)
@@ -48,7 +51,8 @@ for penalty in penalties:
     for t in range(TRIALS):
         print('Penalty {}: Trial {}'.format(penalty, t))
 
-        hitl_env = HITLGridworldEnvironment(fake_human_agent, intervention_penalty=penalty)
+        # hitl_env = HITLGridworldEnvironment(fake_human_agent, intervention_penalty=penalty)
+        hitl_env = HITLBudgetGridworldEnvironment(fake_human_agent, intervention_penalty=penalty, budget= 50)
 
         # this will be our optimally trained agent for the new environment
         agent = vac_preset(hitl_env)

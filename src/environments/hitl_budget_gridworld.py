@@ -22,13 +22,14 @@ class HITLBudgetGridworldEnvironment(GridworldEnvironment):
             human (Agent):  human should be a simulated agent that given the current state of the GymEnvironment will return some action
             device (str, optional): Defaults to torch.device('cpu').
         """
-        super().__init__()
+        
         self.human = human
         self.intervention_penalty = intervention_penalty
         self.interventions_made = 0
         self.unmodified_return = 0
         self.budget = budget
         self.remaining_budget = budget
+        super().__init__()
 
     def reset(self) -> State:
         """

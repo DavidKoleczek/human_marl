@@ -8,21 +8,58 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from environments.hitl_sb_lunarlandercont import HITLSBLunarLanderCont
+from environments.hitl_sb_budget_lunarlandercont import HITLSBBudgetLunarLanderCont
+
 from agents.simulated.sensor import SensorAgent
 from utils.tensorboard_callback import TensorboardCallback
 
+import argparse
 
-human = SAC.load('savedModels/sac_lunar.zip')
-human = SensorAgent(human, 0.1)
 
-env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=1)
-model = SAC('MlpPolicy', env, verbose=1, tensorboard_log='runs')
+def default_params():
+    params = {}
+    params['total_timesteps'] = 350000
+    params['penalty'] = 1
+    params['budget'] = 200
+    params['eval'] = 100
+    
+    return params
 
-log_name = 'SAC_ip={}_human={}'.format(1, 'Sensor0.1')
-model.learn(total_timesteps=350000, tb_log_name=log_name, callback=TensorboardCallback())
-model.save('savedModels/sac_lunar_hitl_1p_sensor01.zip')
 
-# Evaluate the trained agent
-eval_env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human)
-mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=100, deterministic=True)
-print(f'mean_reward={mean_reward:.2f} +/- {std_reward}')
+if __name__ == '__main__':
+    description = ''
+    formatter = argparse.ArgumentDefaultsHelpFormatter
+    parser = argparse.ArgumentParser(description=description, formatter_class=formatter)
+    parser.add_argument('--total_timesteps', type = int, help = 'number of training timesteps')
+    parser.add_argument('--penalty', type=float, help='penalty per intervention')
+    parser.add_argument('--budget', type = int, help='intervention budget')
+    parser.add_argument('--eval', type=int, help='number of evaluation episodes')
+    
+
+    parser.set_defaults(**default_params())
+    args = parser.parse_args()
+    
+    human = SAC.load('../savedModels/sac_lunar.zip')
+    human = SensorAgent(human, 0.1)
+
+    penalty = args.penalty
+    budget = args.budget
+    total_time = args.total_timesteps
+    eval_ep = args.eval
+    
+    print(penalty, budget)
+    # env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=penalty)
+    env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=penalty, budget = budget)
+
+    model = SAC('MlpPolicy', env, verbose=1, tensorboard_log='runs')
+
+    log_name = 'SAC_ip={}_human={}'.format(penalty, 'Sensor0.1')
+    model.learn(total_timesteps=total_time, tb_log_name=log_name, callback=TensorboardCallback())
+    model.save('../savedModels/sac_lunar_hitl_{}p_sensor01.zip'.format(penalty))
+
+    # Evaluate the trained agent
+    # eval_env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human)
+    eval_env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human)
+
+    mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
+    print(f'mean_reward={mean_reward:.2f} +/- {std_reward}')
