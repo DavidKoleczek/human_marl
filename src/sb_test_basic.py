@@ -9,10 +9,10 @@ from environments.hitl_sb_lunarlandercont import HITLSBLunarLanderCont
 from utils.evaluate_policies import compute_metrics_hitl_sb
 
 
-human = SAC.load('savedModels/sac_lunar.zip')
+human = SAC.load('../savedModels/sac_lunar.zip')
 human = NoisyAgent(human, 0.2)
 
-hitl_agent = SAC.load('savedModels/sac_lunar_hitl_1p_sensor01.zip')
+hitl_agent = SAC.load('../savedModels/sac_lunar_hitl_1p_sensor01.zip')
 eval_env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=0)
 
 
