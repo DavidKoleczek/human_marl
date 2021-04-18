@@ -3,6 +3,7 @@
 Follows the OpenAI Gym Environment Interface: https://github.com/openai/gym/blob/151ba406ebf07c5274c99542549aaacd6f70ba24/gym/core.py#L8
 '''
 
+import random
 from copy import deepcopy
 
 import numpy as np
@@ -13,10 +14,11 @@ from gym import spaces
 class HITLSBLunarLanderContEval(gym.Env):
     """Custom Environment that follows gym interface"""
 
-    def __init__(self, env_name, hitl_agent):
+    def __init__(self, env_name, hitl_agent, do_not_intervene=False):
         self.env = gym.make(env_name)
         self.hitl_agent = hitl_agent
         self.state = None
+        self.do_not_intervene = do_not_intervene
 
         # logging variables
         self.interventions_made = 0
@@ -92,21 +94,35 @@ class HITLSBLunarLanderContEval(gym.Env):
         # take the discrete human action and make it continuous
         human_action = self._continuize_action(action)
 
-        # the difference between these if else clauses is that we need to handle the first timestep having a different format
-        if self.env._elapsed_steps > 0:
-            # for use with the HITL agent, we add the human's action to the underlying environment's state
-            curr_state = np.concatenate((self.state[0][0: -self.action_space.shape[0]], human_action))
-            # get the HITL agent's action
-            hitl_action = self.hitl_agent.predict(curr_state)[0]
+        # if hitl_agent is a list of agents, randomly choose one of them to be the hitl_action
+        if isinstance(self.hitl_agent, list):
+            which_agent = random.randrange(0, len(self.hitl_agent))
+            hitl_agent = self.hitl_agent[which_agent]
+            if self.env._elapsed_steps > 0:
+                # for use with the HITL agent, we add the human's action to the underlying environment's state
+                curr_state = np.concatenate((self.state[0][0: -self.action_space.shape[0]], human_action))
+                # get the HITL agent's action
+                hitl_action = hitl_agent.predict(curr_state)[0]
+            else:
+                # same idea as the if clause
+                curr_state = np.concatenate((self.state[0: -self.action_space.shape[0]], human_action))
+                hitl_action = hitl_agent.predict(curr_state)[0]
         else:
-            # same idea as the if clause
-            curr_state = np.concatenate((self.state[0: -self.action_space.shape[0]], human_action))
-            hitl_action = self.hitl_agent.predict(curr_state)[0]
+            # the difference between these if else clauses is that we need to handle the first timestep having a different format
+            if self.env._elapsed_steps > 0:
+                # for use with the HITL agent, we add the human's action to the underlying environment's state
+                curr_state = np.concatenate((self.state[0][0: -self.action_space.shape[0]], human_action))
+                # get the HITL agent's action
+                hitl_action = self.hitl_agent.predict(curr_state)[0]
+            else:
+                # same idea as the if clause
+                curr_state = np.concatenate((self.state[0: -self.action_space.shape[0]], human_action))
+                hitl_action = self.hitl_agent.predict(curr_state)[0]
 
         # assume that the last element in the agent's action vector is what determines if it want's to take a no-op
         # if that element is less than 0, then it took a no-op, so we use the human's action
         did_intervene = True
-        if hitl_action[-1] < 0:
+        if hitl_action[-1] < 0 or self.do_not_intervene:
             did_intervene = False
             hitl_action = human_action
 
