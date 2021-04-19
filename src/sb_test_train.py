@@ -6,12 +6,15 @@ One training run likely takes 1 to 1.5 hours on a mid-high end GPU.
 import gym
 from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
+from eval_interventions import evaluate_policy_interventions
+
 
 from environments.hitl_sb_lunarlandercont import HITLSBLunarLanderCont
 from environments.hitl_sb_budget_lunarlandercont import HITLSBBudgetLunarLanderCont
 
 from agents.simulated.sensor import SensorAgent
 from utils.tensorboard_callback import TensorboardCallback
+import sys
 
 import argparse
 
@@ -20,7 +23,7 @@ def default_params():
     params = {}
     params['total_timesteps'] = 350000
     params['penalty'] = 1
-    params['budget'] = 200
+    params['budget'] = 1000
     params['eval'] = 100
     
     return params
@@ -47,7 +50,7 @@ if __name__ == '__main__':
     total_time = args.total_timesteps
     eval_ep = args.eval
     
-    print(penalty, budget)
+    
     # env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=penalty)
     env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=penalty, budget = budget)
 
@@ -55,11 +58,14 @@ if __name__ == '__main__':
 
     log_name = 'SAC_ip={}_human={}'.format(penalty, 'Sensor0.1')
     model.learn(total_timesteps=total_time, tb_log_name=log_name, callback=TensorboardCallback())
-    model.save('../savedModels/sac_lunar_hitl_{}p_sensor01.zip'.format(penalty))
+    model.save('../savedModels/sac_lunar_hitl_{}p_{}b_sensor01.zip'.format(penalty, budget))
 
     # Evaluate the trained agent
     # eval_env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human)
     eval_env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human)
 
-    mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
+    # mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
+    mean_reward, std_reward, mean_int, std_int = evaluate_policy_interventions(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
     print(f'mean_reward={mean_reward:.2f} +/- {std_reward}')
+    print(f'mean_intervention={mean_int:.2f} +/- {std_int}')
+    print(penalty, budget)
