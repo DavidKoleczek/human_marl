@@ -17,8 +17,12 @@ class HITLSBBudgetLunarLanderCont(gym.Env):
         self.human = human
         self.state = None
         self.intervention_penalty = intervention_penalty
-        self.budget = budget
-        self.remaining_budget = 1.0
+        
+        self.budget = 0
+        self.remaining_budget = 0
+        if budget != 0:
+            self.budget = budget
+            self.remaining_budget = 1.0
 
         # logging variables
         self.interventions_made = 0
