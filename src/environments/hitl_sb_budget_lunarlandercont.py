@@ -12,13 +12,13 @@ from gym import spaces
 class HITLSBBudgetLunarLanderCont(gym.Env):
     """Custom Environment that follows gym interface"""
 
-    def __init__(self, env_name, human, intervention_penalty=0, budget = np.inf):
+    def __init__(self, env_name, human, intervention_penalty=0, budget = 1000):
         self.env = gym.make(env_name)
         self.human = human
         self.state = None
         self.intervention_penalty = intervention_penalty
         self.budget = budget
-        self.remaining_budget = budget
+        self.remaining_budget = 1.0
 
         # logging variables
         self.interventions_made = 0
@@ -88,7 +88,7 @@ class HITLSBBudgetLunarLanderCont(gym.Env):
             penalty = self.intervention_penalty
             self.non_noops_taken += 1  # logging
             self.interventions_made += 1  # logging
-            self.remaining_budget -= 1
+            self.remaining_budget -= 1/self.budget
 
         state = self.env.step(action)
         self.raw_reward += state[1]  # logging
@@ -112,7 +112,7 @@ class HITLSBBudgetLunarLanderCont(gym.Env):
         self.raw_reward = 0
         self.modified_reward = 0
         self.timesteps = self.env._elapsed_steps
-        self.remaining_budget = self.budget
+        self.remaining_budget = 1.0
 
         # keep track of the state so we can provide it to the "human"
         self.state = self.env.reset()
