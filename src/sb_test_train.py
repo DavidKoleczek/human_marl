@@ -3,6 +3,7 @@
 One training run likely takes 1 to 1.5 hours on a mid-high end GPU.
 '''
 
+import numpy as np
 import gym
 from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -65,7 +66,15 @@ if __name__ == '__main__':
     eval_env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human)
 
     # mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
-    mean_reward, std_reward, mean_int, std_int = evaluate_policy_interventions(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
+    rewards, lengths, interventions = evaluate_policy_interventions(model, eval_env, n_eval_episodes=eval_ep, deterministic=True, return_episode_rewards= True)
+    mean_reward = np.mean(rewards)
+    std_reward = np.std(rewards)
+    mean_int = np.mean(interventions)
+    std_int = np.std(interventions)
+    
+    violations = [1 for i in interventions if i > budget]
+    
     print(f'mean_reward={mean_reward:.2f} +/- {std_reward}')
     print(f'mean_intervention={mean_int:.2f} +/- {std_int}')
+    print('Violations = {}/{}'.format(sum(violations),eval_ep))
     print(penalty, budget)
