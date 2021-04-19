@@ -87,7 +87,7 @@ class HITLSBBudgetLunarLanderCont(gym.Env):
         # if the agent took the noop action (last value of action is less than or equal to 0), use the human action
         # otherwise penalize the agent, but take its action
         penalty = 0
-        print(self.remaining_budget)
+        
         if action[-1] <= 0 or self.remaining_budget == 0:
             action = human_action[0]  # indexing at 0 because the human action is wrapped in a tuple
             action = np.concatenate((action, np.array([-1])))  # -1 is basically adding to the state that an intervention was made (noop was made?)
