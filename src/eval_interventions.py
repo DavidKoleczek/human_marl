@@ -5,7 +5,7 @@ import gym
 import numpy as np
 
 from stable_baselines3.common import base_class
-from stable_baselines3.common.vec_env import VecEnv, VecMonitor, is_vecenv_wrapped
+from stable_baselines3.common.vec_env import VecEnv
 
 
 def evaluate_policy_interventions(
@@ -57,7 +57,7 @@ def evaluate_policy_interventions(
 
     if isinstance(env, VecEnv):
         assert env.num_envs == 1, "You must pass only one environment when using this function"
-        is_monitor_wrapped = is_vecenv_wrapped(env, VecMonitor) or env.env_is_wrapped(Monitor)[0]
+        is_monitor_wrapped = env.env_is_wrapped(Monitor)[0]
     else:
         is_monitor_wrapped = is_wrapped(env, Monitor)
 
@@ -104,10 +104,9 @@ def evaluate_policy_interventions(
         else:
             episode_rewards.append(episode_reward)
             episode_lengths.append(episode_length)
-
+        
         episode_interventions.append(env.interventions_made)
-        
-        
+
     mean_reward = np.mean(episode_rewards)
     std_reward = np.std(episode_rewards)
     mean_int = np.mean(episode_interventions)
