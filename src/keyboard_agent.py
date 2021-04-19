@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 
 from environments.hitl_sb_lunarlandercont_eval import HITLSBLunarLanderContEval
+from environments.hitl_budget_sb_lunarlandercont_eval import HITLSBBudgetLunarLanderContEval
 
 
 HITL_LUNAR_AGENT_PATH = 'savedModels/sac_lunar_hitl_1p_sensor00.zip'
@@ -174,19 +175,26 @@ def main(trained_agent_type, zoom_level):
     # 1: Trained with Sensor human and intervention penalty of 1
     # 2: Trained with Noisy human and intervention penalty of 0.15
     # 3: Trained with Noisy human and intervention penalty of 0.75
-    # 4: Ensemble of 1, 2, and 3. i.e. an action is sampled uniformly randomly from one of those agents at each timestep
+    # 4: Trained with Sensor human and intervention budget of 150
+    # 5: Trained with Sensor human and intervention budget of 100
+    # 6: Trained with Sensor human and intervention budget of 50
+    # 7: Ensemble of 1, 2, and 3. i.e. an action is sampled uniformly randomly from one of those agents at each timestep
+
+    # full human control agent
     if trained_agent_type == 0:
         # this agent doesn't actually do anything, just a placeholder to satisfy HITLSBLunarLanderContEval's API
         hitl_agent = SAC.load('sac_lunar_hitl_1p_sensor00.zip')
         eval_env = HITLSBLunarLanderContEval('LunarLanderContinuous-v2', hitl_agent, do_not_intervene=True)
         play(eval_env, zoom=zoom_level, fps=60, keys_to_action=keys_to_action, callback=print_rewards_callback)
-    elif trained_agent_type == 4:
+    # ensemble agent
+    elif trained_agent_type == 7:
         hitl_agent1 = SAC.load('savedModels/sac_lunar_hitl_1p_sensor00.zip')
         hitl_agent2 = SAC.load('savedModels/sac_lunar_hitl_015p_noisy085.zip')
         hitl_agent3 = SAC.load('savedModels/sac_lunar_hitl_075p_noisy085.zip')
         eval_env = HITLSBLunarLanderContEval('LunarLanderContinuous-v2', [hitl_agent1, hitl_agent2, hitl_agent3])
         play(eval_env, zoom=zoom_level, fps=60, keys_to_action=keys_to_action, callback=print_rewards_callback)
-    else:
+    # intervention penalty based agents
+    elif trained_agent_type >= 1 and trained_agent_type <= 3:
         if trained_agent_type == 1:
             HITL_LUNAR_AGENT_PATH = 'savedModels/sac_lunar_hitl_1p_sensor00.zip'
         elif trained_agent_type == 2:
@@ -199,11 +207,29 @@ def main(trained_agent_type, zoom_level):
         # create an instance of an evaluation environment, which takes in human actions in its "step" function
         eval_env = HITLSBLunarLanderContEval('LunarLanderContinuous-v2', hitl_agent)
         play(eval_env, zoom=zoom_level, fps=60, keys_to_action=keys_to_action, callback=print_rewards_callback)
+    # budget-based agents
+    else:
+        intervention_budget = 0
+        if trained_agent_type == 4:
+            HITL_LUNAR_AGENT_PATH = 'savedModels/sac_lunar_hitl_bud150_sensor01.zip'
+            intervention_budget = 150
+        elif trained_agent_type == 5:
+            HITL_LUNAR_AGENT_PATH = 'savedModels/sac_lunar_SAC_bud=100_human=Sensor0.1.zip'
+            intervention_budget = 100
+        else:
+            HITL_LUNAR_AGENT_PATH = 'savedModels/sac_lunar_SAC_bud=50_human=Sensor0.1.zip'
+            intervention_budget = 50
+
+        # load a saved human in the loop agent for LunarLander
+        hitl_agent = SAC.load(HITL_LUNAR_AGENT_PATH)
+        # create an instance of an evaluation environment, which takes in human actions in its "step" function
+        eval_env = HITLSBBudgetLunarLanderContEval('LunarLanderContinuous-v2', hitl_agent, intervention_budget=intervention_budget)
+        play(eval_env, zoom=zoom_level, fps=60, keys_to_action=keys_to_action, callback=print_rewards_callback)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--trained_agent_type', type=int, default=1)
+    parser.add_argument('--trained_agent_type', type=int, default=6)
     parser.add_argument('--zoom_level', type=int, default=2)
 
     args = vars(parser.parse_args())

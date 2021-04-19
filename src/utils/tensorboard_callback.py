@@ -24,3 +24,4 @@ class TensorboardCallback(BaseCallback):
         except ZeroDivisionError:
             intervention_rate = 0
         self.logger.record('rollout/intervention_rate', intervention_rate)
+        self.logger.record('rollout/remaining_budget', self.model.get_env().get_attr('remaining_budget')[0])
