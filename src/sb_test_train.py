@@ -56,7 +56,7 @@ if __name__ == '__main__':
     eval_ep = args.eval
     trials = args.trials
     
-    rewards, lengths, interventions = [], [], []
+    rewards, lengths, interventions, intervention_rate = [], [], [], []
     # env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human, intervention_penalty=penalty)
     for trial in range(trials):
         print('Trial: {}'.format(trial+1))
@@ -70,13 +70,14 @@ if __name__ == '__main__':
 
         # Evaluate the trained agent
         # eval_env = HITLSBLunarLanderCont('LunarLanderContinuous-v2', human)
-        eval_env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human)
+        eval_env = HITLSBBudgetLunarLanderCont('LunarLanderContinuous-v2', human, budget= budget)
         
         # mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=eval_ep, deterministic=True)
         r, l, i = evaluate_policy_interventions(model, eval_env, n_eval_episodes=eval_ep, deterministic=True, return_episode_rewards= True)
         rewards.extend(r)
         lengths.extend(l)
         interventions.extend(i)
+        intervention_rate.append(np.sum(i)/np.sum(l))
     
     mean_reward = np.mean(rewards)
     std_reward = np.std(rewards)
@@ -84,11 +85,15 @@ if __name__ == '__main__':
     std_int = np.std(interventions)
     mean_length = np.mean(lengths)
     std_length = np.std(lengths)
+    mean_ir = np.mean(intervention_rate)
+    std_ir = np.std(intervention_rate)
+    # print(interventions)
     
     violations = [1 for i in interventions if i > budget]
     
     print(f'mean_reward={mean_reward:.2f} +/- {std_reward}')
     print(f'mean_intervention={mean_int:.2f} +/- {std_int}')
     print(f'mean_episode_length={mean_length:.2f} +/- {std_length}')
+    print(f'mean_intervention_rate={mean_ir:.2f} +/- {std_ir}')
     print('Violations = {}/{}'.format(sum(violations),eval_ep*trials))
     print(penalty, budget)
