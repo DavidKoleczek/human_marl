@@ -14,6 +14,8 @@ from environments.hitl_sb_lunarlandercont import HITLSBLunarLanderCont
 from environments.hitl_sb_budget_lunarlandercont import HITLSBBudgetLunarLanderCont
 
 from agents.simulated.sensor import SensorAgent
+from agents.simulated.noisy import NoisyAgent
+from agents.simulated.laggy import LaggyAgent
 from utils.tensorboard_callback import TensorboardCallback
 import sys
 
@@ -29,6 +31,7 @@ def default_params():
     params['budget'] = 1000
     params['eval'] = 100
     params['trials'] = 5
+    params['human'] = 'sensor'
     
     return params
 
@@ -42,14 +45,21 @@ if __name__ == '__main__':
     parser.add_argument('--budget', type = int, help='intervention budget')
     parser.add_argument('--eval', type=int, help='number of evaluation episodes')
     parser.add_argument('--trials', type=int, help='number of trials')
+    parser.add_argument('--human', help='human agent in the loop', choices= ['sensor','laggy','noisy'])
     
 
     parser.set_defaults(**default_params())
     args = parser.parse_args()
     
     human = SAC.load('../savedModels/sac_lunar.zip')
-    human = SensorAgent(human, 0.1)
-
+    
+    if args.human == 'sensor':
+        human = SensorAgent(human, 0.1)
+    elif args.human == 'laggy':
+        human = LaggyAgent(human, 0.8)
+    else:
+        human = NoisyAgent(human, 0.25)
+        
     penalty = args.penalty
     budget = args.budget
     total_time = args.total_timesteps
@@ -90,6 +100,12 @@ if __name__ == '__main__':
     # print(interventions)
     
     violations = [1 for i in interventions if i > budget]
+    
+    path = 'results/h_{}_b_{}_p_{}.csv'.format(args.human,args.budget, args.penalty)
+    
+    with open(path, 'w') as f:
+        f.write('%s,%s,%s,%s,%s,%s,%s,%s,%s,%s \n' % (mean_reward,std_reward,mean_int,std_int,mean_length,std_length,mean_ir,std_ir,sum(violations),eval_ep))
+    
     
     print(f'mean_reward={mean_reward:.2f} +/- {std_reward}')
     print(f'mean_intervention={mean_int:.2f} +/- {std_int}')
