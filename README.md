@@ -9,5 +9,8 @@ Use 'pip install gym-super-mario-bros' to install
 ## Run
 Run the below script in src/examples on gypsum:  
 
-#!/bin/sh  
+#!/bin/bash  
+#SBATCH --partition=longq    
+#SBATCH --time=7-00:00:00   
+#SBATCH --output=noisy_pilot_5.txt  
 python sp_penaltyVSintervention_gypsum.py --discount_factor 0.9 --intervention_punishment 5 --pilot_name "noisy_pilot" --num_models 3
