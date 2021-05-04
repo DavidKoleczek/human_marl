@@ -33,7 +33,7 @@ load_pretrained_full_pilot = True
 env = make_env(using_lander_reward_shaping=True)
 
 agent = DDQN_agent(
-                device = "cuda", 
+                device = "cpu", 
                 discount_factor = 0.99, 
                 last_frame = max_timesteps,
                 lr = 1e-3,
@@ -76,21 +76,21 @@ else:
     torch.save(state, PATH)
 
 
-experiment.show()
-experiment.test()
+# experiment.show()
+# experiment.test()
 
 from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
-noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy)
+noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy, noise_prob = 0.25)
 laggy_pilot_policy = LaggyPilotPolicy(experiment._agent.policy)
 
-experiment.show(policy = noop_pilot_policy)
-experiment.show(policy = sensor_pilot_policy)
-experiment.show(policy = laggy_pilot_policy)
+# experiment.show(policy = noop_pilot_policy)
+# experiment.show(policy = sensor_pilot_policy)
+# experiment.show(policy = laggy_pilot_policy)
 experiment.show(policy = noisy_pilot_policy)
 
-experiment.test(policy = noop_pilot_policy)
-experiment.test(policy = sensor_pilot_policy)
-experiment.test(policy = laggy_pilot_policy)
-experiment.test(policy = noisy_pilot_policy)
+#experiment.test(policy = noop_pilot_policy)
+# experiment.test(policy = sensor_pilot_policy)
+# experiment.test(policy = laggy_pilot_policy)
+# experiment.test(policy = noisy_pilot_policy)
 

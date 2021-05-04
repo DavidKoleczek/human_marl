@@ -15,7 +15,7 @@ import torch
 from all.nn import weighted_mse_loss
 from all.agents._agent import Agent
 
-def DDQN_agent(
+def super_mario_DDQN_agent(
         # Common settings
         device="cpu",
         discount_factor=0.99,
@@ -66,7 +66,7 @@ def DDQN_agent(
         model_constructor (function): The function used to construct the neural model.
     """
     def _ddqn(env, writer=DummyWriter()):
-        action_repeat = 1
+        action_repeat = 4
         last_timestep = last_frame / action_repeat
         last_update = (last_timestep - replay_start_size) / update_frequency
         final_exploration_step = final_exploration_frame / action_repeat

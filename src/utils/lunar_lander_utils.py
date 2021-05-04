@@ -30,6 +30,7 @@ def onehot_encode(i, n=n_act_dim):
     return x
 
 def onehot_decode(x):
+    # print(x)
     l = np.nonzero(x)[0]
     assert len(l) == 1
     return l[0]

@@ -78,6 +78,7 @@ else:
     state = {'q':model.q.model.state_dict(), 'policy.epsilon':model.policy.epsilon}
     torch.save(state, PATH)
 
+# exp_pilot.show()
 
 
 alpha = 0.2
@@ -87,10 +88,11 @@ pilot_name = "noisy_pilot"
 pilot_policy = NoisyPilotPolicy(exp_pilot._agent.policy)
 # pilot_policy = LaggyPilotPolicy(exp_pilot._agent.policy)
 # pilot_policy = noop_pilot_policy
-# pilot_policy = sensor_pilot_policy
+#pilot_policy = sensor_pilot_policy
 
-load_pretrained_co_pilot = False
-PATH = "savedModels/" + pilot_name + "alpha" + str(alpha) + ".pkl"
+load_pretrained_co_pilot = True
+PATH = "savedModels/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
+#PATH = "savedModels/" + pilot_name + "_0.5_alpha_" + str(alpha) + ".pkl"
 
 print(PATH)
 

@@ -97,7 +97,7 @@ class co_DDQN(Agent):
 
 def co_DDQN_agent(
         # Common settings
-        device="cuda",
+        device="cpu",
         discount_factor=0.99,
         last_frame=40e6,
         # Adam optimizer settings
