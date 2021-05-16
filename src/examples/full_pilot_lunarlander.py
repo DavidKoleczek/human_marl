@@ -81,16 +81,20 @@ else:
 
 from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
-noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy, noise_prob = 0.25)
+noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy)
 laggy_pilot_policy = LaggyPilotPolicy(experiment._agent.policy)
 
 # experiment.show(policy = noop_pilot_policy)
 # experiment.show(policy = sensor_pilot_policy)
 # experiment.show(policy = laggy_pilot_policy)
-experiment.show(policy = noisy_pilot_policy)
+#experiment.show(policy = noisy_pilot_policy)
 
-#experiment.test(policy = noop_pilot_policy)
+# print("noop")
+# experiment.test(policy = noop_pilot_policy)
+# print("sensor")
 # experiment.test(policy = sensor_pilot_policy)
+# print("laggy")
 # experiment.test(policy = laggy_pilot_policy)
-# experiment.test(policy = noisy_pilot_policy)
+print("noisy")
+experiment.test(policy = noisy_pilot_policy)
 

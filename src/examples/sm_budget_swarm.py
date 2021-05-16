@@ -11,13 +11,16 @@ import math
 
 
 from agents.super_mario_ddqn_agent import super_mario_DDQN_agent
-from agents.super_mario_co_ddqn_agent import super_mario_co_DDQN_agent
+from agents.super_mario_budget_ddqn_agent import super_mario_budget_DDQN_agent
+
 from models.models import super_mario_nature_ddqn
 from models.models import super_mario_co_ddqn
+from models.models import super_mario_co_budget_ddqn
 from utils.super_mario_experiment import SuperMarioExperiment
 from all.experiments.parallel_env_experiment import ParallelEnvExperiment
 from environments.super_mario_environment import make_env
 from environments.super_mario_environment import make_co_env
+from environments.super_mario_environment import make_co_budget_env
 
 import argparse
 import sys
@@ -29,7 +32,6 @@ def main(args):
     device = "cpu"
     if args.use_gpu:
         device = "cuda"
-    #torch.manual_seed(12345)
 
     max_timesteps = args.max_timesteps
     lr = args.lr
@@ -42,6 +44,7 @@ def main(args):
     final_exploration = args.final_exploration
     final_exploration_frame_ratio =  args.final_exploration_frame_ratio
     num_models = args.num_models
+    budget =args.budget
 
     
 
@@ -106,17 +109,18 @@ def main(args):
     episode_steps = []
 
     for i in range(num_models):
-        name = pilot_name + "_interventionPunishment_" + str(intervention_punishment)
+        name = pilot_name + "_budget_" + str(budget)
         name = name + "_" + str(i)
         PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
+        #PATH = "savedModels/" + name
 
         print("------------------------------------------------------")
         print(name)
         print("------------------------------------------------------")
 
-        co_env, num_states, num_actions = make_co_env(args.world, args.stage, args.action_type, pilot_policy)
+        co_env, num_states, num_actions = make_co_budget_env(args.world, args.stage, args.action_type, pilot_policy, budget)
 
-        co_agent = super_mario_co_DDQN_agent(
+        co_agent = super_mario_budget_DDQN_agent(
                         device = device, 
                         discount_factor = discount_factor, 
                         last_frame = max_timesteps,
@@ -130,7 +134,7 @@ def main(args):
                         replay_buffer_size = 100000,
                         alpha=0.6,
                         beta=0.4,
-                        model_constructor = super_mario_co_ddqn)
+                        model_constructor = super_mario_co_budget_ddqn)
 
         logdir='runs'
         quiet=False
@@ -158,9 +162,9 @@ def main(args):
 
 
         if train:
-            exp_co_pilot.intervention_train(frames=max_timesteps)
+            exp_co_pilot.budget_train(frames=max_timesteps)
 
-        episode_reward, episode_outcome, episode_intervention, episode_step = exp_co_pilot.intervention_test()
+        episode_reward, episode_outcome, episode_intervention, episode_step = exp_co_pilot.budget_test()
         episode_rewards += episode_reward
         episode_outcomes += episode_outcome
         episode_interventions += episode_intervention
@@ -170,13 +174,13 @@ def main(args):
     episode_num = (i + 1) * 100 + 1
 
     
-    mean_1000ep_reward = round(np.mean(episode_rewards[-episode_num:-1]), 1)
-    std_1000ep_reward = round(np.std(episode_rewards[-episode_num:-1], ddof = 1), 1)
-    mean_1000ep_succ = round(np.mean([1 if x==True else 0 for x in episode_outcomes[-episode_num:-1]]), 2)
-    mean_1000ep_intervention = round(np.mean(episode_interventions[-episode_num:-1]), 1)
-    std_1000ep_intervention = round(np.std(episode_interventions[-episode_num:-1], ddof = 1), 1)
-    mean_1000ep_step = round(np.mean(episode_steps[-episode_num:-1]), 1)
-    std_1000ep_step = round(np.std(episode_steps[-episode_num:-1], ddof = 1), 1)
+    mean_1000ep_reward = round(np.mean(episode_rewards[-episode_num:]), 1)
+    std_1000ep_reward = round(np.std(episode_rewards[-episode_num:], ddof = 1), 1)
+    mean_1000ep_succ = round(np.mean([1 if x==True else 0 for x in episode_outcomes[-episode_num:]]), 2)
+    mean_1000ep_intervention = round(np.mean(episode_interventions[-episode_num:]), 1)
+    std_1000ep_intervention = round(np.std(episode_interventions[-episode_num:], ddof = 1), 1)
+    mean_1000ep_step = round(np.mean(episode_steps[-episode_num:]), 1)
+    std_1000ep_step = round(np.std(episode_steps[-episode_num:], ddof = 1), 1)
 
     print("----------------------------------------------------------")
     print("mean 1000 episode reward", mean_1000ep_reward)
@@ -197,16 +201,17 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--gamma', type=float, default=0.9, help='discount factor for rewards')
     parser.add_argument("--use_gpu", type=bool, default=True)
-    parser.add_argument("--max_timesteps", type=int, default=1e7)
+    parser.add_argument("--max_timesteps", type=int, default=2e6)
     parser.add_argument('--discount_factor', type=float, default=0.9, help='discount factor for rewards')
     parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--load_pretrained_full_pilot', type=bool, default=None)
     parser.add_argument('--load_model_path', type=str, default=None)
     parser.add_argument('--pilot_name', type=str, default="noisy_pilot")
-    parser.add_argument('--intervention_punishment', type=float, default=0)
-    parser.add_argument('--final_exploration', type=float, default=0.02)
+    parser.add_argument('--intervention_punishment', type=float, default=1)
+    parser.add_argument('--final_exploration', type=float, default=0.05)
     parser.add_argument('--final_exploration_frame_ratio', type=float, default=0.1)
     parser.add_argument('--num_models', type=int, default=1)
+    parser.add_argument('--budget', type=int, default=300)
 
 
 

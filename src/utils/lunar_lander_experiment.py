@@ -19,7 +19,8 @@ class LundarLanderExperiment(Experiment):
             write_loss=True,
             intervention_punishment = None,
             name = None,
-            path = None
+            path = None,
+            is_penalty_adapt = False
     ):
         super().__init__(self._make_writer(logdir, agent.__name__, env.name, write_loss), quiet)
         self._agent = agent(env, self._writer)
@@ -30,6 +31,7 @@ class LundarLanderExperiment(Experiment):
         self._intervention_punishment = intervention_punishment
         self._name = name
         self._path = path
+        self._is_penalty_adapt = is_penalty_adapt
 
         if render:
             self._env.render(mode="human")
@@ -200,8 +202,12 @@ class LundarLanderExperiment(Experiment):
                 if best_reward < mean_100ep_reward:
                     best_reward = mean_100ep_reward
                     model = self._agent
-                    state = {'q':model.q.model.state_dict(), 'policy.epsilon':model.policy.epsilon}
-                    torch.save(state, self._path)
+                    if self._is_penalty_adapt:
+                        state = {'q':model.q.model.state_dict(), 'penalty':model.penalty}
+                        torch.save(state, self._path)
+                    else:
+                        state = {'q':model.q.model.state_dict(), 'policy.epsilon':model.policy.epsilon}
+                        torch.save(state, self._path)
                     print("Best performance at the moment! Save the model.")
                 print("----------------------------------------------------------")
 
@@ -229,11 +235,15 @@ class LundarLanderExperiment(Experiment):
         print("mean 100 episode succ", mean_100ep_succ)
         print("mean 100 episode crash", mean_100ep_crash)
         print("% time spent exploring", sum_100ep_time)
+        if self._is_penalty_adapt:
+            print("penalty", self._agent.penalty)
         
 
         return mean_100ep_reward
 
     def intervention_test(self, episodes=100, policy = None):
+        if self._is_penalty_adapt:
+            print("penalty", self._agent.penalty)
         f = open(self._name + ".csv",'a')
         episode_rewards = []
         episode_outcomes = []
@@ -790,3 +800,104 @@ class LundarLanderExperiment(Experiment):
         self._budget_run_test_episode(policy)
         self._env.close()
         self._render = render
+
+
+
+
+    def budget_record_observation(self, policy = None):
+        intervention_name = "observation_intervention_" + self._name + ".csv"
+        f = open(intervention_name,'a')
+
+        full_name = "observation_full_" + self._name + ".csv"
+        full_f = open(full_name,'a')
+        if not policy:
+        # use defalut policy
+            policy = self._agent.eval
+
+        # initialize timer
+        start_time = timer()
+
+        interventions = 0
+        steps = 0
+
+        # initialize the episode
+        self._env.reset()
+        state = self._env.state
+        pilot_action = onehot_decode(state.observation[-self._env.action_space.n-1:-1])  
+        budget_run_out = self._env.remaining_budget <= 0
+        action = policy(state)
+        returns = 0
+        steps += 1
+
+
+        obs = ""
+        cnt = 0
+        for i in state.observation.numpy():
+            cnt += 1
+            if cnt == state.observation.numpy().shape[0]:
+                obs += str(i) + "\n"
+            else:
+                obs += str(i) + ", "
+        full_f.write(obs) 
+
+
+        if action != pilot_action:
+            if budget_run_out:
+                action = pilot_action
+            else:
+                self._env.buget_decrease()
+                interventions += 1
+                interventions += 1
+                intervention_obs = ""
+                cnt = 0
+                for i in state.observation.numpy():
+                    cnt += 1
+                    if cnt == state.observation.numpy().shape[0]:
+                        intervention_obs += str(i) + "\n"
+                    else:
+                        intervention_obs += str(i) + ", "
+                f.write(intervention_obs) 
+            #print(intervention_obs)
+        
+
+        # loop until the episode is finished
+        while not state['done']:
+            state = self._env.step(action)
+            pilot_action = onehot_decode(state.observation[-self._env.action_space.n-1:-1]) 
+            budget_run_out = self._env.remaining_budget <= 0 
+            action = policy(state)
+            returns += state['reward']
+            steps += 1
+
+            obs = ""
+            cnt = 0
+            for i in state.observation.numpy():
+                cnt += 1
+                if cnt == state.observation.numpy().shape[0]:
+                    obs += str(i) + "\n"
+                else:
+                    obs += str(i) + ", "
+            full_f.write(obs) 
+
+            if action != pilot_action:
+                if budget_run_out:
+                    action = pilot_action
+                else:
+                    self._env.buget_decrease()
+                    interventions += 1
+                    interventions += 1
+                    intervention_obs = ""
+                    cnt = 0
+                    for i in state.observation.numpy():
+                        cnt += 1
+                        if cnt == state.observation.numpy().shape[0]:
+                            intervention_obs += str(i) + "\n"
+                        else:
+                            intervention_obs += str(i) + ", "
+                    f.write(intervention_obs) 
+
+        # stop the timer
+        end_time = timer()
+        f.close()
+
+        return returns, state['reward'], end_time - start_time, interventions, steps

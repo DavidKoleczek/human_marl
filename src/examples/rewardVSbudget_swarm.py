@@ -153,14 +153,14 @@ def main(pilot_name = "laggy_pilot", intervention_punishment = 0, budget = 300, 
     episode_num = (i + 1) * 100 + 1
 
     
-    mean_1000ep_reward = round(np.mean(episode_rewards[-episode_num:-1]), 1)
-    std_1000ep_reward = round(np.std(episode_rewards[-episode_num:-1], ddof = 1), 1)
-    mean_1000ep_succ = round(np.mean([1 if x==100 else 0 for x in episode_outcomes[-episode_num:-1]]), 2)
-    mean_1000ep_crash = round(np.mean([1 if x==-100 else 0 for x in episode_outcomes[-episode_num:-1]]), 2)
-    mean_1000ep_intervention = round(np.mean(episode_interventions[-episode_num:-1]), 1)
-    std_1000ep_intervention = round(np.std(episode_interventions[-episode_num:-1], ddof = 1), 1)
-    mean_1000ep_step = round(np.mean(episode_steps[-episode_num:-1]), 1)
-    std_1000ep_step = round(np.std(episode_steps[-episode_num:-1], ddof = 1), 1)
+    mean_1000ep_reward = round(np.mean(episode_rewards[-episode_num:]), 1)
+    std_1000ep_reward = round(np.std(episode_rewards[-episode_num:], ddof = 1), 1)
+    mean_1000ep_succ = round(np.mean([1 if x==100 else 0 for x in episode_outcomes[-episode_num:]]), 2)
+    mean_1000ep_crash = round(np.mean([1 if x==-100 else 0 for x in episode_outcomes[-episode_num:]]), 2)
+    mean_1000ep_intervention = round(np.mean(episode_interventions[-episode_num:]), 1)
+    std_1000ep_intervention = round(np.std(episode_interventions[-episode_num:], ddof = 1), 1)
+    mean_1000ep_step = round(np.mean(episode_steps[-episode_num:]), 1)
+    std_1000ep_step = round(np.std(episode_steps[-episode_num:], ddof = 1), 1)
 
     print("----------------------------------------------------------")
     print("mean 1000 episode reward", mean_1000ep_reward)
