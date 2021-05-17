@@ -40,24 +40,3 @@
 * Recommended `pip install autopep8` for automatic code formatting and `pip install pylint` for code analysis
 
 
-## Setup Malmö
-https://github.com/Microsoft/malmo/tree/master/MalmoEnv
-### Windows
-* Clone malmo:  `git clone https://github.com/Microsoft/malmo.git`
-* `cd malmo/Minecraft`
-* Populate the version.properties file with the correct version:  `(echo | set /p dummyName="malmomod.version=" && type "..\VERSION") > ./src/main/resources/version.properties`
-* Go to the MalmoEnv dir: 
-  * `cd ../.. `
-  * `cd malmo/MalmoEnv`
-* Install the package: `py setup.py install`
-
-
-## Malmo Experimentation
-### Windows
-#### Starting a Minecraft client
-* From your project directory: `cd malmo/Minecraft`
-* Launch a Minecraft client: `launchClient.bat -port 9000 -env`
-
-#### Starting an example mission
-* Go to MalmoEnv where scripts written in Python live: `cd malmo/MalmoEnv`
-* Run one of the examples: `py run.py --mission missions/mobchase_single_agent.xml --port 9000 --episodes 10`

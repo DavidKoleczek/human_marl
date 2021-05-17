@@ -1,6 +1,0 @@
-cloudpickle==1.6.0
-gym==0.18.0
-lxml==4.6.2
-malmoenv==0.0.7
-numpy==1.20.1
-pillow==8.1.0
