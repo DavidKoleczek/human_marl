@@ -41,7 +41,7 @@ def human_experiment(human_params):
             log_name = 'SACadapt={}_human={}'.format(rate, 'Sensor0.1')
             output_path = './results/landersacadapt_' + human_agent.__class__.__name__ + '.csv'
 
-            model.learn(total_timesteps=325000, tb_log_name=log_name, callback=TensorboardCallback())
+            model.learn(total_timesteps=600000, tb_log_name=log_name, callback=TensorboardCallback())
             model.save('./saved_models/lander_sac/lander_{}.zip'.format(log_name))
 
             # evaluate the trained agent
