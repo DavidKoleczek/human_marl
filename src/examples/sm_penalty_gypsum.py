@@ -41,7 +41,6 @@ def main(args):
     intervention_punishment = args.intervention_punishment
     final_exploration = args.final_exploration
     final_exploration_frame_ratio =  args.final_exploration_frame_ratio
-    num_models = args.num_models
     model_index = args.model_index
 
     
@@ -179,7 +178,6 @@ if __name__ == '__main__':
     parser.add_argument('--intervention_punishment', type=float, default=50)
     parser.add_argument('--final_exploration', type=float, default=0.05)
     parser.add_argument('--final_exploration_frame_ratio', type=float, default=0.1)
-    parser.add_argument('--num_models', type=int, default=1)
     parser.add_argument('--model_index', type=int, default=0)
 
 
