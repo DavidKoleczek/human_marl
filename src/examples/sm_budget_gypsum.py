@@ -45,6 +45,7 @@ def main(args):
     final_exploration_frame_ratio =  args.final_exploration_frame_ratio
     num_models = args.num_models
     budget =args.budget
+    model_index = args.model_index
 
     
 
@@ -103,94 +104,63 @@ def main(args):
     elif pilot_name == "sensor_pilot":
         pilot_policy = sensor_pilot_policy
 
-    episode_rewards = [] 
-    episode_outcomes = [] 
-    episode_interventions = []
-    episode_steps = []
 
-    for i in range(num_models):
-        name = pilot_name + "_budget_" + str(budget)
-        name = name + "_" + str(i)
-        PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
-        #PATH = "savedModels/" + name
+    name = pilot_name + "_budget_" + str(budget)
+    name = name + "_" + str(model_index)
+    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
+    #PATH = "savedModels/" + name
 
-        print("------------------------------------------------------")
-        print(name)
-        print("------------------------------------------------------")
+    print("------------------------------------------------------")
+    print(name)
+    print("------------------------------------------------------")
 
-        co_env, num_states, num_actions = make_co_budget_env(args.world, args.stage, args.action_type, pilot_policy, budget)
+    co_env, num_states, num_actions = make_co_budget_env(args.world, args.stage, args.action_type, pilot_policy, budget)
 
-        co_agent = super_mario_budget_DDQN_agent(
-                        device = device, 
-                        discount_factor = discount_factor, 
-                        last_frame = max_timesteps,
-                        lr = lr,
-                        target_update_frequency = 1500, 
-                        update_frequency = 4,
-                        final_exploration = final_exploration,
-                        final_exploration_frame = final_exploration_frame_ratio * max_timesteps,
-                        prioritized_replay=True,
-                        replay_start_size = 1000,
-                        replay_buffer_size = 100000,
-                        alpha=0.6,
-                        beta=0.4,
-                        model_constructor = super_mario_co_budget_ddqn)
+    co_agent = super_mario_budget_DDQN_agent(
+                    device = device, 
+                    discount_factor = discount_factor, 
+                    last_frame = max_timesteps,
+                    lr = lr,
+                    target_update_frequency = 1500, 
+                    update_frequency = 4,
+                    final_exploration = final_exploration,
+                    final_exploration_frame = final_exploration_frame_ratio * max_timesteps,
+                    prioritized_replay=True,
+                    replay_start_size = 1000,
+                    replay_buffer_size = 100000,
+                    alpha=0.6,
+                    beta=0.4,
+                    model_constructor = super_mario_co_budget_ddqn)
 
-        logdir='runs'
-        quiet=False
-        render=False
-        write_loss=True
-            
-        exp_co_pilot = SuperMarioExperiment(
-            co_agent,
-            co_env,
-            logdir=logdir,
-            quiet=quiet,
-            render=render,
-            write_loss=write_loss,
-            intervention_punishment = intervention_punishment,
-            name = name,
-            path = PATH
-        )
+    logdir='runs'
+    quiet=False
+    render=False
+    write_loss=True
+        
+    exp_co_pilot = SuperMarioExperiment(
+        co_agent,
+        co_env,
+        logdir=logdir,
+        quiet=quiet,
+        render=render,
+        write_loss=write_loss,
+        intervention_punishment = intervention_punishment,
+        name = name,
+        path = PATH
+    )
 
-        if load_pretrained_full_pilot:
-            PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + load_model_path))
-            checkpoint = torch.load(PATH)
-            exp_co_pilot._agent.q.model.load_state_dict(checkpoint['q'])
-            exp_co_pilot._agent.policy.q.model.load_state_dict(checkpoint['q'])
+    if load_pretrained_full_pilot:
+        PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + load_model_path))
+        checkpoint = torch.load(PATH)
+        exp_co_pilot._agent.q.model.load_state_dict(checkpoint['q'])
+        exp_co_pilot._agent.policy.q.model.load_state_dict(checkpoint['q'])
 
 
 
-        if train:
-            exp_co_pilot.budget_train(frames=max_timesteps)
+    if train:
+        exp_co_pilot.budget_train(frames=max_timesteps)
 
-        episode_reward, episode_outcome, episode_intervention, episode_step = exp_co_pilot.budget_test()
-        episode_rewards += episode_reward
-        episode_outcomes += episode_outcome
-        episode_interventions += episode_intervention
-        episode_steps += episode_step
-
-
-    episode_num = (i + 1) * 100 + 1
-
-    
-    mean_1000ep_reward = round(np.mean(episode_rewards[-episode_num:]), 1)
-    std_1000ep_reward = round(np.std(episode_rewards[-episode_num:], ddof = 1), 1)
-    mean_1000ep_succ = round(np.mean([1 if x==True else 0 for x in episode_outcomes[-episode_num:]]), 2)
-    mean_1000ep_intervention = round(np.mean(episode_interventions[-episode_num:]), 1)
-    std_1000ep_intervention = round(np.std(episode_interventions[-episode_num:], ddof = 1), 1)
-    mean_1000ep_step = round(np.mean(episode_steps[-episode_num:]), 1)
-    std_1000ep_step = round(np.std(episode_steps[-episode_num:], ddof = 1), 1)
-
-    print("----------------------------------------------------------")
-    print("mean 1000 episode reward", mean_1000ep_reward)
-    print("std 1000 episode reward", std_1000ep_reward)
-    print("mean 1000 episode intervention", mean_1000ep_intervention)
-    print("std 1000 episode intervention", std_1000ep_intervention)
-    print("mean 1000 episode steps", mean_1000ep_step)
-    print("std 1000 episode steps", std_1000ep_step)
-    print("mean 1000 episode succ", mean_1000ep_succ)
-    print("----------------------------------------------------------")
+    episode_reward, episode_outcome, episode_intervention, episode_step = exp_co_pilot.budget_test()
 
 
 if __name__ == '__main__':
@@ -212,6 +182,7 @@ if __name__ == '__main__':
     parser.add_argument('--final_exploration_frame_ratio', type=float, default=0.1)
     parser.add_argument('--num_models', type=int, default=1)
     parser.add_argument('--budget', type=int, default=300)
+    parser.add_argument('--model_index', type=int, default=0)
 
 
 
