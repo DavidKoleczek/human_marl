@@ -23,6 +23,7 @@ def human_experiment(human_params):
         human = train_optimal_agent()
     else:
         human = SAC.load('./saved_models/lander_sac_optimal.zip')
+        human = train_optimal_agent()
         print(evaluate_policy(human, env=gym.make('LunarLanderContinuous-v2'), n_eval_episodes=100, deterministic=True))
 
     # create a simulated human agent
