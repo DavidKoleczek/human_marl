@@ -2,7 +2,9 @@ import os
 import csv
 import argparse
 
+import gym
 from stable_baselines3 import SAC
+from stable_baselines3.common.evaluation import evaluate_policy
 
 from src.utils.lander_sac_optimal_agent import train_optimal_agent
 from src.agents.simulated.sensor_sb import SensorAgent
@@ -10,6 +12,7 @@ from src.agents.simulated.laggy_sb import LaggyAgent
 from src.agents.simulated.noisy_sb import NoisyAgent
 from src.environments.sb.penaltyadapt_hitl import HITLLanderContinuousAdapt
 from src.utils.eval_interventions import evaluate_policy_interventions
+
 
 from src.utils.tensorboard_callback import TensorboardCallback
 
@@ -20,6 +23,7 @@ def human_experiment(human_params):
         human = train_optimal_agent()
     else:
         human = SAC.load('./saved_models/lander_sac_optimal.zip')
+        print(evaluate_policy(human, env=gym.make('LunarLanderContinuous-v2'), n_eval_episodes=100, deterministic=True))
 
     # create a simulated human agent
     human_parameter = human_params[1]
@@ -36,13 +40,13 @@ def human_experiment(human_params):
             log_name = 'SACadapt={}_human={}'.format(rate, 'Sensor0.1')
             output_path = './results/landersacadapt_' + human_agent.__class__.__name__ + '.csv'
 
-            model.learn(total_timesteps=2500, tb_log_name=log_name, callback=TensorboardCallback())
+            model.learn(total_timesteps=325000, tb_log_name=log_name, callback=TensorboardCallback())
             model.save('./saved_models/lander_sac/lander_{}.zip'.format(log_name))
 
             # evaluate the trained agent
             eval_env = HITLLanderContinuousAdapt('LunarLanderContinuous-v2', human)
             mean_reward, mean_int, mean_eplen, mean_int_rate = evaluate_policy_interventions(
-                model, eval_env, n_eval_episodes=5, deterministic=True, return_episode_rewards=False)
+                model, eval_env, n_eval_episodes=100, deterministic=True, return_episode_rewards=False)
 
             # save the results for each trial to a csv file
             os.makedirs(os.path.dirname(output_path), exist_ok=True)

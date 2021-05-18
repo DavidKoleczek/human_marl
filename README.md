@@ -18,6 +18,7 @@ High level installation steps:
 * Upgrade pip: `python -m pip install --upgrade pip setuptools wheel`
 * Install the correct version of PyTorch for your system at https://pytorch.org/get-started/locally/ 
 * Install the other dependencies with `pip install -r requirements.txt`
+* Install the library code as a package `pip install --editable .`
 * For development, we recommended `pip install autopep8` for automatic code formatting and `pip install pylint` for code analysis
 
 * Installation of [ALL](https://github.com/cpnota/autonomous-learning-library) required a manual download of [swig](http://www.swig.org/download.html), adding the folder to path, and then `pip install autonomous-learning-library`

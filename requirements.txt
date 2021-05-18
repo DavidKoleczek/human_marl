@@ -33,14 +33,10 @@ requests-oauthlib==1.3.0
 rsa==4.7.2
 scipy==1.6.3
 six==1.16.0
--e git+https://github.com/DavidKoleczek/human_marl.git@fa18baeb2e511cfcb3c80275b47acd4bd7fc404e#egg=src
 stable-baselines3==1.0
 tensorboard==2.5.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.0
-torch==1.8.1+cu111
-torchaudio==0.8.1
-torchvision==0.9.1+cu111
 typing-extensions==3.10.0.0
 urllib3==1.26.4
 Werkzeug==2.0.0
