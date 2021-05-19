@@ -75,9 +75,9 @@ def main(args):
         write_loss=write_loss
     )
 
-    #PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/super_mario_pilot_model_reward_64.0.pkl"))
+    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/super_mario_pilot_model_reward_64.0.pkl"))
 
-    PATH = "savedModels/super_mario_pilot_model_reward_64.0.pkl" 
+    #PATH = "savedModels/super_mario_pilot_model_reward_64.0.pkl" 
     
     checkpoint = torch.load(PATH)
     exp_pilot._agent.q.model.load_state_dict(checkpoint['q'])
@@ -96,8 +96,8 @@ def main(args):
 
     name = pilot_name + "_intervention_rate_" + str(intervention_rate)
     name = name + "_" + str(model_index)
-    #PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
-    PATH = "savedModels/" + name
+    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
+    #PATH = "savedModels/" + name
 
 
     print("------------------------------------------------------")
