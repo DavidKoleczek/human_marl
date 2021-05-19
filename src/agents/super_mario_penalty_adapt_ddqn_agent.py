@@ -114,11 +114,19 @@ class PADDQN(Agent):
 
             if self.penalty[0] < 0:
                 self.penalty.requires_grad = False
-                self.penalty =torch.ones(1) / 10000
+                self.penalty = (torch.ones(1) / 100000).cuda()
+                self.penalty.requires_grad = True
+            
+            if self.penalty[0] > 100:
+                self.penalty.requires_grad = False
+                self.penalty = (torch.ones(1) * 100).cuda()
+                self.penalty.requires_grad = True
+                
 
             #update replay buffer priorities
             td_errors = penalty_targets - values
             self.replay_buffer.update_priorities(td_errors.abs())
+            print(self.penalty)
 
 
 
@@ -198,7 +206,7 @@ def super_mario_penalty_adapt_DDQN_agent(
         
         penalty_optimizer = Adam(
             [{'params': penalty}],
-            lr=lr/20,
+            lr=lr/10,
             eps=eps
         )
 

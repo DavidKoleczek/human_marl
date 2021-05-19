@@ -55,7 +55,7 @@ def main(args):
                     final_exploration_frame = 0.1 * max_timesteps,
                     prioritized_replay=True,
                     replay_start_size = 1000,
-                    replay_buffer_size = 100000,
+                    replay_buffer_size = 50000,
                     alpha=0.6,
                     beta=0.4,
                     model_constructor = super_mario_nature_ddqn)
@@ -75,9 +75,9 @@ def main(args):
         write_loss=write_loss
     )
 
-    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/super_mario_pilot_model_reward_64.0.pkl"))
+    #PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/super_mario_pilot_model_reward_64.0.pkl"))
 
-    #PATH = "savedModels/super_mario_pilot_model_reward_64.0.pkl" 
+    PATH = "savedModels/super_mario_pilot_model_reward_64.0.pkl" 
     
     checkpoint = torch.load(PATH)
     exp_pilot._agent.q.model.load_state_dict(checkpoint['q'])
@@ -96,8 +96,8 @@ def main(args):
 
     name = pilot_name + "_intervention_rate_" + str(intervention_rate)
     name = name + "_" + str(model_index)
-    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
-    #PATH = "savedModels/" + name
+    #PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
+    PATH = "savedModels/" + name
 
 
     print("------------------------------------------------------")
@@ -120,6 +120,7 @@ def main(args):
                     replay_buffer_size = 100000,
                     alpha=0.6,
                     beta=0.4,
+                    budget_intervention_rate = intervention_rate,
                     model_constructor = super_mario_co_ddqn)
 
     logdir='runs'
@@ -171,7 +172,7 @@ if __name__ == '__main__':
     parser.add_argument('--intervention_punishment', type=float, default=0)
     parser.add_argument('--final_exploration', type=float, default=0.05)
     parser.add_argument('--final_exploration_frame_ratio', type=float, default=0.1)
-    parser.add_argument('--intervention_rate', type=float, default=0)
+    parser.add_argument('--intervention_rate', type=float, default=0.5)
     parser.add_argument('--model_index', type=int, default=0)
 
 
