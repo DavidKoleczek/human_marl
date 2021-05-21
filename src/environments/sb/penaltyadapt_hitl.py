@@ -11,11 +11,12 @@ from gym import spaces
 class HITLLanderContinuousAdapt(gym.Env):
     """Custom Environment that follows gym interface"""
 
-    def __init__(self, env_name, human, intervention_rate=0, initial_intervention_penalty=1):
+    def __init__(self, env_name, human, intervention_rate=0, initial_intervention_penalty=1, eval_mode=False):
         self.env = gym.make(env_name)
         self.human = human
         self.state = None
-        self.intervention_penalty = initial_intervention_penalty
+        self.initial_intervention_penalty = initial_intervention_penalty
+        self.intervention_penalty = self.initial_intervention_penalty
         self.intervention_rate = intervention_rate
         self.penalty_alpha = 0.01
         self.intervention_indicator = 0
@@ -27,6 +28,8 @@ class HITLLanderContinuousAdapt(gym.Env):
         self.raw_reward = 0
         self.modified_reward = 0
         self.timesteps = self.env._elapsed_steps
+        # If this is true, do not modify reward
+        self.eval_mode = eval_mode
 
     @property
     def action_space(self):
@@ -93,7 +96,9 @@ class HITLLanderContinuousAdapt(gym.Env):
         # current action to the observation and also add the intervention penalty
         temp = list(state)
         temp[0] = np.concatenate((state[0], action))
-        temp[1] -= penalty
+        # if in evaluation mode, do not modify the penalty.
+        if not self.eval_mode:
+            temp[1] -= penalty
         state = tuple(temp)
 
         self.modified_reward += temp[1]  # logging

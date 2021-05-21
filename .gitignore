@@ -1,4 +1,6 @@
 # human_marl specific
+py37/
+env37/
 results/
 saved_models/lander_sac
 malmo/

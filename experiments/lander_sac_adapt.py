@@ -12,19 +12,15 @@ from src.agents.simulated.laggy_sb import LaggyAgent
 from src.agents.simulated.noisy_sb import NoisyAgent
 from src.environments.sb.penaltyadapt_hitl import HITLLanderContinuousAdapt
 from src.utils.eval_interventions import evaluate_policy_interventions
-
-
 from src.utils.tensorboard_callback import TensorboardCallback
 
 
-def human_experiment(human_params):
+def human_experiment(human_params, num_trials):
     # we need an optimal agent to base our simulated agents
     if not os.path.exists('./saved_models/lander_sac_optimal.zip'):
         human = train_optimal_agent()
     else:
         human = SAC.load('./saved_models/lander_sac_optimal.zip')
-        human = train_optimal_agent()
-        print(evaluate_policy(human, env=gym.make('LunarLanderContinuous-v2'), n_eval_episodes=100, deterministic=True))
 
     # create a simulated human agent
     human_parameter = human_params[1]
@@ -32,7 +28,7 @@ def human_experiment(human_params):
 
     intervention_rates = [0.1, 0.25, 0.5, 0.75]
     # run 10 trials for each hyperparameter setting
-    for _ in range(1):
+    for _ in list(range(num_trials)):
         for rate in intervention_rates:
             env = HITLLanderContinuousAdapt('LunarLanderContinuous-v2', human,
                                             intervention_rate=rate, initial_intervention_penalty=1)
@@ -41,11 +37,11 @@ def human_experiment(human_params):
             log_name = 'SACadapt={}_human={}'.format(rate, 'Sensor0.1')
             output_path = './results/landersacadapt_' + human_agent.__class__.__name__ + '.csv'
 
-            model.learn(total_timesteps=600000, tb_log_name=log_name, callback=TensorboardCallback())
+            model.learn(total_timesteps=350000, tb_log_name=log_name, callback=TensorboardCallback())
             model.save('./saved_models/lander_sac/lander_{}.zip'.format(log_name))
 
             # evaluate the trained agent
-            eval_env = HITLLanderContinuousAdapt('LunarLanderContinuous-v2', human)
+            eval_env = HITLLanderContinuousAdapt('LunarLanderContinuous-v2', human, eval_mode=True)
             mean_reward, mean_int, mean_eplen, mean_int_rate = evaluate_policy_interventions(
                 model, eval_env, n_eval_episodes=100, deterministic=True, return_episode_rewards=False)
 
@@ -59,11 +55,4 @@ def human_experiment(human_params):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("human_number", type=int)
-    args = parser.parse_args()
-
-    human_number = args.human_number
-    humans = [(SensorAgent, 0.1), (LaggyAgent, 0.8), (NoisyAgent, 0.15)]
-
-    human_experiment(humans[human_number])
+    human_experiment((SensorAgent, 0.1), 10)

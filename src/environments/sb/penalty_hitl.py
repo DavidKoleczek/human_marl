@@ -11,7 +11,7 @@ from gym import spaces
 class HITLLanderContinuous(gym.Env):
     """Custom Environment that follows gym interface"""
 
-    def __init__(self, env_name, human, intervention_penalty=0):
+    def __init__(self, env_name, human, intervention_penalty=0, eval_mode=False):
         self.env = gym.make(env_name)
         self.human = human
         self.state = None
@@ -24,6 +24,7 @@ class HITLLanderContinuous(gym.Env):
         self.raw_reward = 0
         self.modified_reward = 0
         self.timesteps = self.env._elapsed_steps
+        self.eval_mode = eval_mode
 
     @property
     def action_space(self):
@@ -88,7 +89,9 @@ class HITLLanderContinuous(gym.Env):
         # current action to the observation and also add the intervention penalty
         temp = list(state)
         temp[0] = np.concatenate((state[0], action))
-        temp[1] -= penalty
+        # if in evaluation mode, do not modify the penalty.
+        if not self.eval_mode:
+            temp[1] -= penalty
         state = tuple(temp)
 
         self.modified_reward += temp[1]  # logging
