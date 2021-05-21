@@ -335,7 +335,7 @@ class SuperMarioExperiment(Experiment):
         # update experiment state
         self._episode += 1
 
-        return returns, state['reward'], end_time - start_time, interventions, steps
+        return returns, state['flag_get'], end_time - start_time, interventions, steps
 
     def _intervention_run_test_episode(self, policy = None):
         if not policy:
@@ -490,8 +490,7 @@ class SuperMarioExperiment(Experiment):
     def _budget_log_100_performance(self, episode_rewards, episode_outcomes, episode_times, episode_interventions, episode_steps):
         mean_100ep_reward = round(np.mean(episode_rewards[-101:-1]), 1)
         std_100ep_reward = round(np.std(episode_rewards[-101:-1], ddof = 1), 1)
-        mean_100ep_succ = round(np.mean([1 if x==100 else 0 for x in episode_outcomes[-101:-1]]), 2)
-        mean_100ep_crash = round(np.mean([1 if x==-100 else 0 for x in episode_outcomes[-101:-1]]), 2)
+        mean_100ep_succ = round(np.mean([1 if x==True else 0 for x in episode_outcomes[-101:-1]]), 2)
         sum_100ep_time = int(np.sum(episode_times[-101:-1]))
         num_episodes = len(episode_rewards)
         mean_100ep_intervention = round(np.mean(episode_interventions[-101:-1]), 1)
@@ -508,7 +507,6 @@ class SuperMarioExperiment(Experiment):
         print("mean 100 episode steps", mean_100ep_step)
         print("std 100 episode steps", std_100ep_step)
         print("mean 100 episode succ", mean_100ep_succ)
-        print("mean 100 episode crash", mean_100ep_crash)
         print("% time spent exploring", sum_100ep_time)
         
 
@@ -531,13 +529,11 @@ class SuperMarioExperiment(Experiment):
             #self._log_test_episode(episode, rewards)
 
             succ = 0
-            crash = 0
-            if outcomes == 100:
+            if outcomes == True:
                 succ = 1
-            elif outcomes == -100:
-                crash = 1
-            print('episode: {}, rewards: {}, interventions: {}, total steps: {}, succ: {}, crash: {}'.format(episode, rewards, interventions, steps, succ, crash))
-            f.write(str(rewards) + ", " + str(interventions) + ", " + str(steps) + ", " + str(succ) + ", " + str(crash) + "\n" ) 
+
+            print('episode: {}, rewards: {}, interventions: {}, total steps: {}, succ: {}'.format(episode, rewards, interventions, steps, succ))
+            f.write(str(rewards) + ", " + str(interventions) + ", " + str(steps) + ", " + str(succ) + "\n" ) 
         f.close()
         self._log_test(episode_rewards)
         self._budget_log_100_performance(episode_rewards, episode_outcomes, episode_times, episode_interventions, episode_steps)
@@ -603,20 +599,20 @@ class SuperMarioExperiment(Experiment):
         steps = self._frame - start_frame
 
 
-        if state['reward'] == 100:
+
+        if state['flag_get'] == True:
             succ = 1
-        elif state['reward'] == -100:
-            crash = 1
+
 
 
         # log the results
         #self._log_training_episode(returns, fps)
-        print('episode: {}, frame: {}, fps: {}, returns: {}, interventions: {}, steps: {}, succ: {}, crash: {}'.format(self._episode, self._frame, int(fps), returns, interventions, steps, succ, crash))
+        print('episode: {}, frame: {}, fps: {}, returns: {}, interventions: {}, steps: {}, succ: {}'.format(self._episode, self._frame, int(fps), returns, interventions, steps, succ))
 
         # update experiment state
         self._episode += 1
 
-        return returns, state['reward'], end_time - start_time, interventions, steps
+        return returns, state['flag_get'], end_time - start_time, interventions, steps
 
     def _budget_run_test_episode(self, policy = None):
         if not policy:
@@ -667,7 +663,7 @@ class SuperMarioExperiment(Experiment):
         # stop the timer
         end_time = timer()
 
-        return returns, state['reward'], end_time - start_time, interventions, steps
+        return returns, state['flag_get'], end_time - start_time, interventions, steps
 
     def budget_show(self, policy = None):
         render = self._render

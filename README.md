@@ -25,7 +25,7 @@ python sm_alpha_gypsum.py --discount_factor 0.9 --max_timesteps 5000000 --final_
 python sm_budget_gypsum.py --discount_factor 0.9 --max_timesteps 5000000 --final_exploration 0.05 --pilot_name "noisy_pilot" --model_index 0 --budget 50
 
 
-### Penalty(budget = 0.05, 0.1, 0.2, 0.5, 1, 2, 5)  
+### Penalty(penalty = 0.05, 0.1, 0.2, 0.5, 1, 2, 5)  
 #!/bin/bash    
 #SBATCH --partition=titanx-long  
 #SBATCH --gres=gpu:1  
