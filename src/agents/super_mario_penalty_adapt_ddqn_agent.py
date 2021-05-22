@@ -126,7 +126,7 @@ class PADDQN(Agent):
             #update replay buffer priorities
             td_errors = penalty_targets - values
             self.replay_buffer.update_priorities(td_errors.abs())
-            print(self.penalty)
+            #print(self.penalty)
 
 
 
