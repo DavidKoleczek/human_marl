@@ -232,10 +232,6 @@ class BudgetGymEnvironment(Environment):
             raise TypeError("Unknown action space type")
         return action
 
-
-
-
-
 def make_co_budget_env(pilot_policy, budget = 300, using_lander_reward_shaping=False):
     env = gym.make('LunarLanderContinuous-v2')
     #env = gym.wrappers.Monitor(env, "recording", force=True)

@@ -19,7 +19,6 @@ import zipfile
 from agents.ddqn_agent import DDQN_agent
 from models.models import lunar_lander_nature_ddqn
 from utils.lunar_lander_experiment import LundarLanderExperiment
-from all.experiments.parallel_env_experiment import ParallelEnvExperiment
 from environments.lunar_lander_environment import make_env
 
 #Every episode is at most 1000 steps. Use 500 episodes to train
@@ -76,25 +75,25 @@ else:
     torch.save(state, PATH)
 
 
-# experiment.show()
-# experiment.test()
+experiment.show()
+experiment.test()
 
 from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
 noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy)
 laggy_pilot_policy = LaggyPilotPolicy(experiment._agent.policy)
 
-# experiment.show(policy = noop_pilot_policy)
-# experiment.show(policy = sensor_pilot_policy)
-# experiment.show(policy = laggy_pilot_policy)
-#experiment.show(policy = noisy_pilot_policy)
+experiment.show(policy = noop_pilot_policy)
+experiment.show(policy = sensor_pilot_policy)
+experiment.show(policy = laggy_pilot_policy)
+experiment.show(policy = noisy_pilot_policy)
 
-# print("noop")
-# experiment.test(policy = noop_pilot_policy)
-# print("sensor")
-# experiment.test(policy = sensor_pilot_policy)
-# print("laggy")
-# experiment.test(policy = laggy_pilot_policy)
+print("noop")
+experiment.test(policy = noop_pilot_policy)
+print("sensor")
+experiment.test(policy = sensor_pilot_policy)
+print("laggy")
+experiment.test(policy = laggy_pilot_policy)
 print("noisy")
 experiment.test(policy = noisy_pilot_policy)
 

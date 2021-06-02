@@ -492,14 +492,9 @@ class LundarLanderExperiment(Experiment):
                 obs += str(i) + ", "
         full_f.write(obs) 
 
-        # print("steps", steps)
-        # print("state", state)
-        # print("action", action)
 
         if action != pilot_action:
             interventions += 1
-            #print("intervene")
-            #print(state.observation)
             intervention_obs = ""
             cnt = 0
             for i in state.observation.numpy():
@@ -509,28 +504,14 @@ class LundarLanderExperiment(Experiment):
                 else:
                     intervention_obs += str(i) + ", "
             f.write(intervention_obs) 
-            #print(intervention_obs)
         
 
         # loop until the episode is finished
         while not state['done']:
-            # if self._render:
-            #     frame = self._env.render(mode='rgb_array')
-            #     im = Image.fromarray(frame)
-            #     name = str(steps) + ".png"
-            #     path = os.path.join(image_path, name)
-
-            #     if not os.path.exists(image_path):
-            #         os.makedirs(image_path)
-
-            #     im.save(path)
 
             state = self._env.step(action)
             pilot_action = onehot_decode(state.observation[-self._env.action_space.n:]) 
             action = policy(state)
-            # print("steps", steps)
-            # print("state", state)
-            # print("action", action)
             returns += state['reward']
             steps += 1
 
@@ -546,8 +527,6 @@ class LundarLanderExperiment(Experiment):
 
             if action != pilot_action:
                 interventions += 1
-                #print(state.observation.numpy())
-                #f.write(str(state.observation.numpy()))
                 intervention_obs = ""
                 cnt = 0
                 for i in state.observation.numpy():
@@ -556,11 +535,7 @@ class LundarLanderExperiment(Experiment):
                         intervention_obs += str(i) + "\n"
                     else:
                         intervention_obs += str(i) + ", "
-                #print(intervention_obs)
                 f.write(intervention_obs) 
-            #     print("intervene!")
-            # print("pilot action: " + str(pilot_action) + " copilot action: " + str(action))
-            # print("-------------------------------------------------")
 
         # stop the timer
         end_time = timer()

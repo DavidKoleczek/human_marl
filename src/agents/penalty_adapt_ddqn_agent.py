@@ -92,30 +92,11 @@ class PADDQN(Agent):
             # compute targets
             next_actions = torch.argmax(self.q.no_grad(next_states), dim=1)
             targets = rewards + self.discount_factor * self.q.target(next_states, next_actions)
-            # print(states.observation.shape)
-            # print(states.observation[:, -self._act_num:].shape)
-            # print(states.observation[:, -self._act_num:])
 
             pilot_actions = torch.nonzero(states.observation[:, -self._act_num:])[:,1]
-            # print(pilot_actions)
-            # print(pilot_actions.shape)
-            # print(pilot_actions[:,1])
-            # print(l)
-            # print(l[0])
-            # print(l[1])
-            # pilot_actions = [onehot_decode(statestate[-self._act_num:])for state in states]
-            # print("pilot_actions", pilot_actions)
-            # print("actions", actions)
 
             intervention_indicator = (pilot_actions != actions).int()
-            # print("intervention_indicator", intervention_indicator)
             penalty_targets = targets + self.penalty * (self.budget_intervention_rate - intervention_indicator)
-
-            #print(penalty_targets)
-            # print(self.penalty)
-            # print(self.budget_intervention_rate - intervention_indicator)
-            # print(self.penalty * (self.budget_intervention_rate - intervention_indicator))
-            # print(self.penalty.grad)
 
 
             # compute loss
@@ -128,10 +109,8 @@ class PADDQN(Agent):
 
             #lamda/penalty update
             penalty_loss = torch.mean(self.penalty * (self.budget_intervention_rate - intervention_indicator))
-            #print("penalty loss", penalty_loss)
             penalty_loss.backward()
             self.penalty_optimizer.step()
-            #print(self.penalty.grad)
             self.penalty_optimizer.zero_grad()
 
             if self.penalty[0] < 0:

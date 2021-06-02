@@ -66,9 +66,6 @@ class IPDDQN(Agent):
         if intervention_punishment != 0 and self._state is not None:
             pilot_action = onehot_decode(self._state.observation[-action_num-1:-1]) 
             if self._action != pilot_action:
-                # if env.remaining_budget > 0:
-                #     env.remaining_budget -= 1
-                # else:
                 if budget_run_out:
                     state['reward'] -= intervention_punishment
 

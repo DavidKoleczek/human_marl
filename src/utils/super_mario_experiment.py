@@ -71,15 +71,20 @@ class SuperMarioExperiment(Experiment):
 
     def _log_100_performance(self, episode_rewards, episode_outcomes, episode_times, episode_steps):
         mean_100ep_reward = round(np.mean(episode_rewards[-101:-1]), 1)
+        std_100ep_reward = round(np.std(episode_rewards[-101:-1], ddof = 1), 1)
         mean_100ep_succ = round(np.mean([1 if x==True else 0 for x in episode_outcomes[-101:-1]]), 2)
         sum_100ep_time = int(np.sum(episode_times[-101:-1]))
+        sum_100ep_time = int(np.sum(episode_times[-101:]))
         num_episodes = len(episode_rewards)
         mean_100ep_step = round(np.mean(episode_steps[-101:-1]), 1)
+        std_100ep_step = round(np.std(episode_steps[-101:-1], ddof = 1), 1)
     
         print("----------------------------------------------------------")
         print("episodes", num_episodes)
         print("mean 100 episode reward", mean_100ep_reward)
+        print("std 100 episode reward", std_100ep_reward)
         print("mean 100 episode steps", mean_100ep_step)
+        print("std 100 episode steps", std_100ep_step)
         print("mean 100 episode succ", mean_100ep_succ)
         print("% time spent exploring", sum_100ep_time)
         print("----------------------------------------------------------")
@@ -103,6 +108,10 @@ class SuperMarioExperiment(Experiment):
         self._log_100_performance(episode_rewards, episode_outcomes, episode_times, episode_steps)
         return episode_rewards
 
+
+
+
+
     def _run_training_episode(self):
         # initialize timer
         start_time = timer()
@@ -123,8 +132,6 @@ class SuperMarioExperiment(Experiment):
             action = self._agent.act(state)
             returns += state['reward']
             self._frame += 1
-            if self._frame - start_frame > 800:
-                break
 
 
         # stop the timer
@@ -164,10 +171,6 @@ class SuperMarioExperiment(Experiment):
                 self._env.render()
             state = self._env.step(action)
             action = policy(state)
-            # if np.random.rand() < 0:
-            #     action = np.random.randint(0, self._env.action_space.n)
-            # print("state", state.observation.shape)
-            # print("action", action)
             returns += state['reward']
             steps += 1
 
@@ -260,7 +263,6 @@ class SuperMarioExperiment(Experiment):
             episode_times.append(times)
             episode_interventions.append(interventions)
             episode_steps.append(steps)
-            #self._log_test_episode(episode, rewards)
 
             succ = 0
             if outcomes == True:
@@ -312,9 +314,6 @@ class SuperMarioExperiment(Experiment):
         
             if action != pilot_action:
                 interventions += 1
-            
-            if self._frame - start_frame > 800:
-                break
 
         # stop the timer
         end_time = timer()
@@ -356,7 +355,31 @@ class SuperMarioExperiment(Experiment):
         returns = 0
         steps += 1
 
-        if action != pilot_action:
+        noop = [0]
+        right = [1,2,3,4]
+        act = [5]
+        left = [6,7,8,9]
+        down = [10]
+        up = [11]
+
+
+        action_sequence = []
+        if pilot_action == 0:
+            action_sequence += noop + up + down +  act + right + left
+        elif pilot_action >= 1 and pilot_action <= 4:
+            action_sequence += right + up + down +  act + noop + left
+        elif pilot_action == 5:
+            action_sequence += act + up + down +  down + right + left + noop
+        elif pilot_action >= 6 and pilot_action <= 9:
+            action_sequence += left + up + down +  act + noop + right
+        elif pilot_action == 10:
+            action_sequence += down + act + right + left + noop + up
+        elif pilot_action == 11:
+            action_sequence += up +  act + right + left + noop + down
+        action_sequence.remove(pilot_action)
+
+
+        if action != pilot_action and action!= action_sequence[0]:
             interventions += 1
 
         # loop until the episode is finished
@@ -369,7 +392,25 @@ class SuperMarioExperiment(Experiment):
             returns += state['reward']
             steps += 1
 
-            if action != pilot_action:
+
+
+            action_sequence = []
+            if pilot_action == 0:
+                action_sequence += noop + up + down +  act + right + left
+            elif pilot_action >= 1 and pilot_action <= 4:
+                action_sequence += right + up + down +  act + noop + left
+            elif pilot_action == 5:
+                action_sequence += act + up + down +  down + right + left + noop
+            elif pilot_action >= 6 and pilot_action <= 9:
+                action_sequence += left + up + down +  act + noop + right
+            elif pilot_action == 10:
+                action_sequence += down + act + right + left + noop + up
+            elif pilot_action == 11:
+                action_sequence += up +  act + right + left + noop + down
+            action_sequence.remove(pilot_action)
+
+
+            if action != pilot_action and action!= action_sequence[0]:
                 interventions += 1
 
         # stop the timer

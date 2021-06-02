@@ -29,7 +29,6 @@ def main(args):
     device = "cpu"
     if args.use_gpu:
         device = "cuda"
-    #torch.manual_seed(12345)
 
     max_timesteps = args.max_timesteps
     lr = args.lr
@@ -80,7 +79,6 @@ def main(args):
     )
 
     PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/super_mario_pilot_model_reward_64.0.pkl"))
-
     #PATH = "savedModels/super_mario_pilot_model_reward_64.0.pkl" 
     
     checkpoint = torch.load(PATH)
@@ -108,8 +106,8 @@ def main(args):
 
     name = pilot_name + "_alpha_" + str(alpha)
     name = name + "_" + str(model_index)
-    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
-    #PATH = "savedModels/" + name
+    #PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + name)) 
+    PATH = "savedModels/" + name
 
     print("------------------------------------------------------")
     print(name)
@@ -151,7 +149,8 @@ def main(args):
     )
 
     if load_pretrained_full_pilot:
-        PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + load_model_path))
+        #PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/" + load_model_path))
+        PATH = "savedModels/noisy_pilot_alpha_1.0_0.pkl"
         checkpoint = torch.load(PATH)
         exp_co_pilot._agent.q.model.load_state_dict(checkpoint['q'])
         exp_co_pilot._agent.policy.q.model.load_state_dict(checkpoint['q'])
@@ -179,14 +178,14 @@ if __name__ == '__main__':
     parser.add_argument("--use_gpu", type=bool, default=True)
     parser.add_argument("--max_timesteps", type=int, default=2e6)
     parser.add_argument('--discount_factor', type=float, default=0.9, help='discount factor for rewards')
-    parser.add_argument('--train', type=bool, default=True)
-    parser.add_argument('--load_pretrained_full_pilot', type=bool, default=None)
+    parser.add_argument('--train', type=bool, default=False)
+    parser.add_argument('--load_pretrained_full_pilot', type=bool, default=True)
     parser.add_argument('--load_model_path', type=str, default=None)
     parser.add_argument('--pilot_name', type=str, default="noisy_pilot")
     parser.add_argument('--intervention_punishment', type=float, default=0)
-    parser.add_argument('--final_exploration', type=float, default=0.05)
+    parser.add_argument('--final_exploration', type=float, default=0.02)
     parser.add_argument('--final_exploration_frame_ratio', type=float, default=0.1)
-    parser.add_argument('--alpha', type=float, default=1)
+    parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--model_index', type=int, default=0)
 
 

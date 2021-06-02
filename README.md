@@ -1,41 +1,20 @@
-# Cooperative Multi Agent Reinforcement Learning with Human in the Loop
+# On Optimizing Interventions in Shared Autonomy
 
 
-# Installation (WIP)
+# Installation 
+## RL library
+[The Autonomous Learning Library](https://github.com/cpnota/autonomous-learning-library/tree/31e5aa9d85b4f1d1ad386b8e87c7d09fd8d31302) version 0.6.2  
+Use 'pip install autonomous-learning-library==0.6.2'  
+Also install the related library including [pytorch](https://pytorch.org/) > 1.3 
+
 ## Env for Super Mario 
-gym-super-mario-bros: https://pypi.org/project/gym-super-mario-bros/  
+[gym-super-mario-bros](https://pypi.org/project/gym-super-mario-bros/)  
 Use 'pip install gym-super-mario-bros' to install  
 
-## Run
-Run the below script in src/examples on gypsum:  
+# Run
+## Get a simulated agent.   
+You can train your own agent with any methods 
+or use the code we provide, src/examples/lunar_lander_full_pilot.py and super_mario_full_pilot.py to train. We have already provided the trained models in savedModels.
 
-
-### Baseline(alpha = 0, 0.2, 0.4, 0.6, 0.8, 1)  
-#!/bin/bash    
-#SBATCH --partition=titanx-long  
-#SBATCH --gres=gpu:1  
-#SBATCH --output=alpha_0.1_0.txt  
-python sm_alpha_gypsum.py --discount_factor 0.9 --max_timesteps 5000000 --final_exploration 0.05 --pilot_name "noisy_pilot" --model_index 0 --alpha 0.1
-
-### Budget(budget = 0, 50, 100, 150, 200, 250, 300, 350, 400)  
-#!/bin/bash    
-#SBATCH --partition=titanx-long  
-#SBATCH --gres=gpu:1  
-#SBATCH --output=budget_50_0.txt  
-python sm_budget_gypsum.py --discount_factor 0.9 --max_timesteps 5000000 --final_exploration 0.05 --pilot_name "noisy_pilot" --model_index 0 --budget 50
-
-
-### Penalty(penalty = 0.05, 0.1, 0.2, 0.5, 1, 2, 5)  
-#!/bin/bash    
-#SBATCH --partition=titanx-long  
-#SBATCH --gres=gpu:1  
-#SBATCH --output=penalty_0.1_0.txt  
-python sm_penalty_gypsum.py --discount_factor 0.9 --max_timesteps 5000000 --final_exploration 0.05 --pilot_name "noisy_pilot" --model_index 0 --intervention_punishment 0.1
-
-
-### Penalty_adapt(intervention_rate = 0, 0.2, 0.4, 0.6, 0.8, 1)  
-#!/bin/bash    
-#SBATCH --partition=titanx-long  
-#SBATCH --gres=gpu:1  
-#SBATCH --output=interventio_rate_0.2_0.txt  
-python sm_penalty_adapt_gypsum.py --discount_factor 0.9 --max_timesteps 5000000 --final_exploration 0.05 --pilot_name "noisy_pilot" --model_index 0 --intervention_rate 0.2
+## Use the simulated agent to train copilot.  
+Use the code in src/examples to train the copilot. 

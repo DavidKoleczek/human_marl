@@ -29,7 +29,6 @@ def main(args):
     device = "cpu"
     if args.use_gpu:
         device = "cuda"
-    #torch.manual_seed(12345)
 
     max_timesteps = args.max_timesteps
     lr = args.lr

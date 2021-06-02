@@ -61,46 +61,20 @@ class SharedAutonomyPolicy(Schedulable):
         action_sequence = []
         if pi_action == 0:
             action_sequence += noop + up + down +  act + right + left
-            action_sequence.remove(pi_action)
         elif pi_action >= 1 and pi_action <= 4:
             action_sequence += right + up + down +  act + noop + left
-            action_sequence.remove(pi_action)
         elif pi_action == 5:
             action_sequence += act + up + down +  down + right + left + noop
-            action_sequence.remove(pi_action)
         elif pi_action >= 6 and pi_action <= 9:
             action_sequence += left + up + down +  act + noop + right
-            action_sequence.remove(pi_action)
         elif pi_action == 10:
             action_sequence += down + act + right + left + noop + up
-            action_sequence.remove(pi_action)
         elif pi_action == 11:
             action_sequence += up +  act + right + left + noop + down
-            action_sequence.remove(pi_action)
 
         for action in action_sequence:
             if q_values[action] >= (1 - pilot_tol_ph) * opt_q_values:
                 return action
 
-        # if necessary, switch steering and keep main
-        # try to use human's action for main engine, copilot's action for steering
-        # evalute whether the new mixed action is suitable
-        mixed_action = 3 * (pi_action // 3) + (opt_action % 3)
-        # if >, still use human action, otherwise use mix action
-        mixed_action = pi_action if pi_act_q_values >= (1 - pilot_tol_ph) * opt_q_values else mixed_action
-
-        # if necessary, keep steering and switch main
-        # try to use human's action for steering, copilot's action for main engine
-        # evalute whether the new mixed action is suitable
-        mixed_act_q_values = q_values[mixed_action]
-        steer_mixed_action = 3 * (opt_action // 3) + (pi_action % 3)
-        # if >, still use the preivous output, otherwise use steer_mix action
-        mixed_action = mixed_action if mixed_act_q_values >= (1 - pilot_tol_ph) * opt_q_values else mixed_action
-
-        # if necessary, switch steering and main
-        # try to use copilot's action for main engine and steering
-        # evalute whether the new mixed action is suitable
-        mixed_act_q_values = q_values[mixed_action]
-        action = mixed_action if mixed_act_q_values >= (1 - pilot_tol_ph) * opt_q_values else opt_action
 
         return action

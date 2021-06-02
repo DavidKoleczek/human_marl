@@ -82,7 +82,6 @@ def main(args):
     )
 
     PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "savedModels/super_mario_pilot_model_reward_64.0.pkl"))
-
     #PATH = "savedModels/super_mario_pilot_model_reward_64.0.pkl" 
     
     checkpoint = torch.load(PATH)
