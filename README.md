@@ -1,9 +1,8 @@
-# Optimizing Interventions in Shared Autonomy
+# On Optimizing Interventions in Shared Autonomy
 
 # Code Structure
 * Main executable scripts are in the `experiments` folder, start here!
 * Library code is located under the `src` folder.
-
 
 # Installation
 High level installation steps:

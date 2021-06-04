@@ -1,4 +1,15 @@
 # human_marl specific
+LanderMainTest.ipynb
+LanderSAC.ipynb
+LunarLanderMain.ipynb
+Mario.ipynb
+test.py
+Untitled.ipynb
+Untitled2.ipynb
+plots/landersac/
+plots/lunarlander/
+plots/supermario/
+runs/
 py37/
 env37/
 results/
