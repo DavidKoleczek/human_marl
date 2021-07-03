@@ -22,10 +22,10 @@ from utils.lunar_lander_experiment import LundarLanderExperiment
 from all.experiments.parallel_env_experiment import ParallelEnvExperiment
 from environments.lunar_lander_environment import make_env
 
-#Every episode is at most 1000 steps. Use 500 episodes to train
+# Every episode is at most 1000 steps. Use 500 episodes to train
 max_ep_len = 1000
 n_training_episodes = 500
-max_timesteps = max_ep_len *  n_training_episodes
+max_timesteps = max_ep_len * n_training_episodes
 
 # If true, load the pretrained model. If false, train the model from the scratch.
 load_pretrained_full_pilot = True
@@ -33,25 +33,25 @@ load_pretrained_full_pilot = True
 env = make_env(using_lander_reward_shaping=True)
 
 agent = DDQN_agent(
-                device = "cpu", 
-                discount_factor = 0.99, 
-                last_frame = max_timesteps,
-                lr = 1e-3,
-                target_update_frequency = 1500, 
-                update_frequency = 1,
-                final_exploration = 0.02,
-                final_exploration_frame = 0.1 * max_timesteps,
-                replay_start_size = 1000,
-                replay_buffer_size = 50000,
-                model_constructor = lunar_lander_nature_ddqn)
+    device="cpu",
+    discount_factor=0.99,
+    last_frame=max_timesteps,
+    lr=1e-3,
+    target_update_frequency=1500,
+    update_frequency=1,
+    final_exploration=0.02,
+    final_exploration_frame=0.1 * max_timesteps,
+    replay_start_size=1000,
+    replay_buffer_size=50000,
+    model_constructor=lunar_lander_nature_ddqn)
 
-frames=max_timesteps
-logdir='runs'
-quiet=False
-render=False
-test_episodes=100
-write_loss=True
-    
+frames = max_timesteps
+logdir = 'runs'
+quiet = False
+render = False
+test_episodes = 100
+write_loss = True
+
 make_experiment = LundarLanderExperiment
 experiment = make_experiment(
     agent,
@@ -62,7 +62,7 @@ experiment = make_experiment(
     write_loss=write_loss,
 )
 
-PATH = "savedModels/pilot_model.pkl"
+PATH = "saved_models/pilot_model.pkl"
 
 if load_pretrained_full_pilot:
     checkpoint = torch.load(PATH)
@@ -72,7 +72,7 @@ if load_pretrained_full_pilot:
 else:
     experiment.train(frames=frames)
     model = experiment._agent
-    state = {'q':model.q.model.state_dict(), 'policy.epsilon':model.policy.epsilon}
+    state = {'q': model.q.model.state_dict(), 'policy.epsilon': model.policy.epsilon}
     torch.save(state, PATH)
 
 
@@ -81,16 +81,15 @@ else:
 
 from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
-noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy, noise_prob = 0.25)
+noisy_pilot_policy = NoisyPilotPolicy(experiment._agent.policy, noise_prob=0.25)
 laggy_pilot_policy = LaggyPilotPolicy(experiment._agent.policy)
 
 # experiment.show(policy = noop_pilot_policy)
 # experiment.show(policy = sensor_pilot_policy)
 # experiment.show(policy = laggy_pilot_policy)
-experiment.show(policy = noisy_pilot_policy)
+experiment.show(policy=noisy_pilot_policy)
 
 #experiment.test(policy = noop_pilot_policy)
 # experiment.test(policy = sensor_pilot_policy)
 # experiment.test(policy = laggy_pilot_policy)
 # experiment.test(policy = noisy_pilot_policy)
-

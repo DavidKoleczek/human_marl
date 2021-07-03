@@ -29,10 +29,10 @@ from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_
 n_act_dim = 6
 n_obs_dim = 9
 
-#Every episode is at most 1000 steps. Use 500 episodes to train
+# Every episode is at most 1000 steps. Use 500 episodes to train
 max_ep_len = 1000
 n_training_episodes = 500
-max_timesteps = max_ep_len *  n_training_episodes
+max_timesteps = max_ep_len * n_training_episodes
 
 # If true, load the pretrained model. If false, train the model from the scratch.
 load_pretrained_full_pilot = True
@@ -40,20 +40,20 @@ load_pretrained_full_pilot = True
 env = make_env(using_lander_reward_shaping=True)
 
 agent = DDQN_agent(
-                device = "cuda", 
-                discount_factor = 0.99, 
-                last_frame = max_timesteps,
-                lr = 1e-3,
-                target_update_frequency = 1500, 
-                update_frequency = 1,
-                final_exploration = 0.02,
-                final_exploration_frame = 0.1 * max_timesteps,
-                replay_start_size = 1000,
-                replay_buffer_size = 50000,
-                model_constructor = lunar_lander_nature_ddqn)
+    device="cuda",
+    discount_factor=0.99,
+    last_frame=max_timesteps,
+    lr=1e-3,
+    target_update_frequency=1500,
+    update_frequency=1,
+    final_exploration=0.02,
+    final_exploration_frame=0.1 * max_timesteps,
+    replay_start_size=1000,
+    replay_buffer_size=50000,
+    model_constructor=lunar_lander_nature_ddqn)
 
-frames=max_timesteps
-    
+frames = max_timesteps
+
 exp_pilot = LundarLanderExperiment(
     agent,
     env,
@@ -63,7 +63,7 @@ exp_pilot = LundarLanderExperiment(
     write_loss=True
 )
 
-PATH = "savedModels/pilot_model.pkl"
+PATH = "saved_models/pilot_model.pkl"
 
 load_pretrained_pilot = True
 
@@ -75,7 +75,7 @@ if load_pretrained_pilot:
 else:
     exp_pilot.train(frames=frames)
     model = exp_pilot._agent
-    state = {'q':model.q.model.state_dict(), 'policy.epsilon':model.policy.epsilon}
+    state = {'q': model.q.model.state_dict(), 'policy.epsilon': model.policy.epsilon}
     torch.save(state, PATH)
 
 # exp_pilot.show()
@@ -91,30 +91,30 @@ pilot_policy = NoisyPilotPolicy(exp_pilot._agent.policy)
 #pilot_policy = sensor_pilot_policy
 
 load_pretrained_co_pilot = True
-PATH = "savedModels/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
-#PATH = "savedModels/" + pilot_name + "_0.5_alpha_" + str(alpha) + ".pkl"
+PATH = "saved_models/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
+#PATH = "saved_models/" + pilot_name + "_0.5_alpha_" + str(alpha) + ".pkl"
 
 print(PATH)
 
-co_env = make_co_env(pilot_policy = pilot_policy, using_lander_reward_shaping=True)
+co_env = make_co_env(pilot_policy=pilot_policy, using_lander_reward_shaping=True)
 
 co_agent = co_DDQN_agent(
-                device = "cuda", 
-                discount_factor = 0.99, 
-                last_frame = max_timesteps,
-                lr = 1e-3,
-                target_update_frequency = 1500, 
-                update_frequency = 1,
-                final_exploration = 0.02,
-                final_exploration_frame = 0.1 * max_timesteps,
-                replay_start_size = 1000,
-                replay_buffer_size = 50000,
-                model_constructor = lunar_lander_nature_ddqn,
-                pilot_tol = alpha
-                )
+    device="cuda",
+    discount_factor=0.99,
+    last_frame=max_timesteps,
+    lr=1e-3,
+    target_update_frequency=1500,
+    update_frequency=1,
+    final_exploration=0.02,
+    final_exploration_frame=0.1 * max_timesteps,
+    replay_start_size=1000,
+    replay_buffer_size=50000,
+    model_constructor=lunar_lander_nature_ddqn,
+    pilot_tol=alpha
+)
 
-frames=max_timesteps
-    
+frames = max_timesteps
+
 exp_co_pilot = LundarLanderExperiment(
     co_agent,
     co_env,
@@ -132,7 +132,7 @@ if load_pretrained_co_pilot:
 else:
     exp_co_pilot.train(frames=frames)
     model = exp_co_pilot._agent
-    state = {'q':model.q.model.state_dict(), 'policy.epsilon':model.policy.epsilon}
+    state = {'q': model.q.model.state_dict(), 'policy.epsilon': model.policy.epsilon}
     torch.save(state, PATH)
 
 exp_co_pilot.show()
