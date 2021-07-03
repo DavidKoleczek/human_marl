@@ -158,3 +158,26 @@ test/
 
 # runs
 runs/
+
+# recording
+recording/
+
+# results
+results/
+
+# observation
+observation/
+
+#plots
+plots/
+
+#savedFrames
+savedFrames/
+
+#models
+wrong/
+super_mario/
+intervention_penalty/
+intervention_alpha/
+
+
