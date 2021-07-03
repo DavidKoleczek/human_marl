@@ -8,7 +8,7 @@ import numpy as np
 import subprocess as sp
 from all.environments import GymEnvironment
 import gym
-from utils.lunar_lander_utils import disc_to_cont, onehot_encode, onehot_decode
+from src.utils.lunar_lander_utils import disc_to_cont, onehot_encode, onehot_decode
 from gym import spaces, wrappers
 import types
 from all.environments import GymEnvironment

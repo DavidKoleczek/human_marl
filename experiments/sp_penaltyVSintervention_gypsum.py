@@ -1,28 +1,21 @@
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import argparse
 
 import torch
 import numpy as np
-import pickle
-import random
-import os
-import math
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-from agents.super_mario_ddqn_agent import super_mario_DDQN_agent
-from agents.super_mario_co_ddqn_agent import super_mario_co_DDQN_agent
-from models.models import super_mario_nature_ddqn
-from models.models import super_mario_co_ddqn
-from utils.super_mario_experiment import SuperMarioExperiment
-from all.experiments.parallel_env_experiment import ParallelEnvExperiment
-from environments.super_mario_environment import make_env
-from environments.super_mario_environment import make_co_env
-
-import argparse
-import sys
-
-from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
+from src.agents.super_mario_ddqn_agent import super_mario_DDQN_agent
+from src.agents.super_mario_co_ddqn_agent import super_mario_co_DDQN_agent
+from src.models.models import super_mario_nature_ddqn
+from src.models.models import super_mario_co_ddqn
+from src.utils.super_mario_experiment import SuperMarioExperiment
+from src.environments.super_mario_environment import make_env
+from src.environments.super_mario_environment import make_co_env
+from src.agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
 
 def main(args):
@@ -76,7 +69,7 @@ def main(args):
         write_loss=write_loss
     )
 
-    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "saved_models/super_mario_pilot_model_reward_64.0.pkl"))
+    PATH = os.path.abspath(os.path.join(os.getcwd(), "./", "saved_models/super_mario_pilot_model_reward_64.0.pkl"))
 
     #PATH = "saved_models/super_mario_pilot_model_reward_64.0.pkl"
 
@@ -103,7 +96,7 @@ def main(args):
     for i in range(num_models):
         name = pilot_name + "_interventionPunishment_" + str(intervention_punishment)
         name = name + "_" + str(i)
-        PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "saved_models/" + name))
+        PATH = os.path.abspath(os.path.join(os.getcwd(), "./", "saved_models/" + name))
 
         print("------------------------------------------------------")
         print(name)
@@ -145,7 +138,7 @@ def main(args):
         )
 
         if load_pretrained_full_pilot:
-            PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "saved_models/" + load_model_path))
+            PATH = os.path.abspath(os.path.join(os.getcwd(), "./", "saved_models/" + load_model_path))
             checkpoint = torch.load(PATH)
             exp_co_pilot._agent.q.model.load_state_dict(checkpoint['q'])
             exp_co_pilot._agent.policy.q.model.load_state_dict(checkpoint['q'])

@@ -10,8 +10,8 @@ from all.memory import PrioritizedReplayBuffer
 from all.memory import ExperienceReplayBuffer
 from all.nn import weighted_smooth_l1_loss
 from all.optim import LinearScheduler
-from policy.shared_autonomy_policy import SharedAutonomyPolicy
-from models.models import nature_ddqn
+from src.policy.shared_autonomy_policy import SharedAutonomyPolicy
+from src.models.models import nature_ddqn
 
 import torch
 from all.nn import weighted_mse_loss

@@ -3,27 +3,14 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import torch
-import numpy as np
-import pickle
-import random
-import os
-import math
-import types
-import uuid
-import time
-from copy import copy
-from collections import defaultdict, Counter
-#import dill
-import tempfile
-import zipfile
 
-from agents.ddqn_agent import DDQN_agent
-from agents.co_ddqn_agent import co_DDQN_agent
-from models.models import lunar_lander_nature_ddqn
-from utils.lunar_lander_experiment import LundarLanderExperiment
-from environments.lunar_lander_environment import make_co_env
-from environments.lunar_lander_environment import make_env
-from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
+from src.agents.ddqn_agent import DDQN_agent
+from src.agents.co_ddqn_agent import co_DDQN_agent
+from src.models.models import lunar_lander_nature_ddqn
+from src.utils.lunar_lander_experiment import LundarLanderExperiment
+from src.environments.lunar_lander_environment import make_co_env
+from src.environments.lunar_lander_environment import make_env
+from src.agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
 # dims for action and observation
 n_act_dim = 6
@@ -63,7 +50,7 @@ exp_pilot = LundarLanderExperiment(
     write_loss=True
 )
 
-PATH = "saved_models/pilot_model.pkl"
+PATH = "./saved_models/pilot_model.pkl"
 
 load_pretrained_pilot = True
 
@@ -91,7 +78,7 @@ pilot_policy = NoisyPilotPolicy(exp_pilot._agent.policy)
 #pilot_policy = sensor_pilot_policy
 
 load_pretrained_co_pilot = True
-PATH = "saved_models/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
+PATH = "./saved_models/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
 #PATH = "saved_models/" + pilot_name + "_0.5_alpha_" + str(alpha) + ".pkl"
 
 print(PATH)

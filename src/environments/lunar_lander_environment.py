@@ -1,4 +1,4 @@
-from utils.lunar_lander_utils import disc_to_cont, onehot_encode, onehot_decode
+from src.utils.lunar_lander_utils import disc_to_cont, onehot_encode, onehot_decode
 from gym import spaces, wrappers
 import gym
 import types

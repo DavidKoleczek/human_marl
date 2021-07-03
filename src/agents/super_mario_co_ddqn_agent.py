@@ -9,13 +9,13 @@ from all.memory import ExperienceReplayBuffer
 from all.nn import weighted_smooth_l1_loss
 from all.optim import LinearScheduler
 from all.policies import GreedyPolicy
-from models.models import nature_ddqn
-from models.super_mario_network import QNetwork
+from src.models.models import nature_ddqn
+from src.models.super_mario_network import QNetwork
 
 import torch
 from all.nn import weighted_mse_loss
 from all.agents._agent import Agent
-from utils.lunar_lander_utils import onehot_decode
+from src.utils.lunar_lander_utils import onehot_decode
 import numpy as np
 
 class IPDDQN(Agent):

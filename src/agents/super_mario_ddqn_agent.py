@@ -9,7 +9,7 @@ from all.memory import ExperienceReplayBuffer
 from all.nn import weighted_smooth_l1_loss
 from all.optim import LinearScheduler
 from all.policies import GreedyPolicy
-from models.models import nature_ddqn
+from src.models.models import nature_ddqn
 
 import torch
 from all.nn import weighted_mse_loss

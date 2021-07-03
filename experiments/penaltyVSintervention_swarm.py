@@ -1,38 +1,25 @@
 import os
 import sys
+import argparse
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import torch
 import numpy as np
-import pickle
-import random
-import os
-import math
-import types
-import uuid
-import time
-from copy import copy
-from collections import defaultdict, Counter
-#import dill
-import tempfile
-import zipfile
 
-from agents.ddqn_agent import DDQN_agent
-from agents.co_ddqn_agent import co_DDQN_agent
-from agents.intervention_punishment_ddqn_agent import intervention_punishment_DDQN_agent
-from models.models import lunar_lander_nature_ddqn
-from utils.lunar_lander_experiment import LundarLanderExperiment
-from environments.lunar_lander_environment import make_co_env
-from environments.lunar_lander_environment import make_env
-from agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
-
-import argparse
-import sys
+from src.agents.ddqn_agent import DDQN_agent
+from src.agents.intervention_punishment_ddqn_agent import intervention_punishment_DDQN_agent
+from src.models.models import lunar_lander_nature_ddqn
+from src.utils.lunar_lander_experiment import LundarLanderExperiment
+from src.environments.lunar_lander_environment import make_co_env
+from src.environments.lunar_lander_environment import make_env
+from src.agents.lunar_lander_simulated_agent import sensor_pilot_policy, noop_pilot_policy, NoisyPilotPolicy, LaggyPilotPolicy
 
 
-def main(pilot_name="laggy_pilot", alpha=0, n_training_episodes=1000, train_pretrained_co_pilot=True):
+
+def main(pilot_name="laggy_pilot", intervention_punishment=0, n_training_episodes=1000, train_pretrained_co_pilot=True):
     pilot_name = pilot_name
-    alpha = alpha
+    intervention_punishment = intervention_punishment
     n_training_episodes = n_training_episodes
     train_pretrained_co_pilot = train_pretrained_co_pilot
 
@@ -71,7 +58,7 @@ def main(pilot_name="laggy_pilot", alpha=0, n_training_episodes=1000, train_pret
         write_loss=False
     )
 
-    PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "saved_models/pilot_model.pkl"))
+    PATH = os.path.abspath(os.path.join(os.getcwd(), "./", "saved_models/pilot_model.pkl"))
 
     checkpoint = torch.load(PATH, map_location=torch.device('cpu'))
     exp_pilot._agent.q.model.load_state_dict(checkpoint['q'])
@@ -92,16 +79,17 @@ def main(pilot_name="laggy_pilot", alpha=0, n_training_episodes=1000, train_pret
     episode_interventions = []
     episode_steps = []
     for i in range(10):
-        name = pilot_name + "_alpha_" + str(alpha)
+        name = pilot_name + "_interventionPunishment_" + str(intervention_punishment)
         name = name + "_" + str(i)
-        PATH = os.path.abspath(os.path.join(os.getcwd(), "../..", "saved_models", name + ".pkl"))
+        PATH = os.path.abspath(os.path.join(os.getcwd(), "./", "saved_models", name + ".pkl"))
 
         print("------------------------------------------------------")
         print(name)
         print("------------------------------------------------------")
 
         co_env = make_co_env(pilot_policy=pilot_policy, using_lander_reward_shaping=True)
-        co_agent = co_DDQN_agent(
+
+        co_agent = intervention_punishment_DDQN_agent(
             device="cpu",
             discount_factor=0.99,
             last_frame=max_timesteps,
@@ -112,9 +100,7 @@ def main(pilot_name="laggy_pilot", alpha=0, n_training_episodes=1000, train_pret
             final_exploration_frame=0.1 * max_timesteps,
             replay_start_size=1000,
             replay_buffer_size=50000,
-            model_constructor=lunar_lander_nature_ddqn,
-            pilot_tol=alpha
-        )
+            model_constructor=lunar_lander_nature_ddqn)
 
         frames = max_timesteps
 
@@ -125,6 +111,7 @@ def main(pilot_name="laggy_pilot", alpha=0, n_training_episodes=1000, train_pret
             quiet=False,
             render=False,
             write_loss=False,
+            intervention_punishment=intervention_punishment,
             name=name,
             path=PATH
         )
@@ -169,7 +156,7 @@ def main(pilot_name="laggy_pilot", alpha=0, n_training_episodes=1000, train_pret
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pilot_name', type=str, default="laggy_pilot")
-    parser.add_argument('--alpha', type=float, default=0)
+    parser.add_argument('--intervention_punishment', type=float, default=0)
     parser.add_argument('--n_training_episodes', type=int, default=1000)
     parser.add_argument('--train_pretrained_co_pilot', type=bool, default=True)
     args = vars(parser.parse_args())

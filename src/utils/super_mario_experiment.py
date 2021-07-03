@@ -2,7 +2,7 @@ from timeit import default_timer as timer
 import numpy as np
 from all.experiments.writer import ExperimentWriter
 from all.experiments.experiment import Experiment
-from utils.lunar_lander_utils import onehot_decode
+from src.utils.lunar_lander_utils import onehot_decode
 import torch
 from PIL import Image
 import os

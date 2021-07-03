@@ -3,24 +3,11 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import torch
-import numpy as np
-import pickle
-import random
-import os
-import math
-import uuid
-import time
-from copy import copy
-from collections import defaultdict, Counter
-#import dill
-import tempfile
-import zipfile
 
-from agents.ddqn_agent import DDQN_agent
-from models.models import lunar_lander_nature_ddqn
-from utils.lunar_lander_experiment import LundarLanderExperiment
-from all.experiments.parallel_env_experiment import ParallelEnvExperiment
-from environments.lunar_lander_environment import make_env
+from src.agents.ddqn_agent import DDQN_agent
+from src.models.models import lunar_lander_nature_ddqn
+from src.utils.lunar_lander_experiment import LundarLanderExperiment
+from src.environments.lunar_lander_environment import make_env
 
 # Every episode is at most 1000 steps. Use 500 episodes to train
 max_ep_len = 1000
@@ -28,7 +15,7 @@ n_training_episodes = 500
 max_timesteps = max_ep_len * n_training_episodes
 
 # If true, load the pretrained model. If false, train the model from the scratch.
-load_pretrained_full_pilot = True
+load_pretrained_full_pilot = False
 
 env = make_env(using_lander_reward_shaping=True)
 
@@ -62,7 +49,7 @@ experiment = make_experiment(
     write_loss=write_loss,
 )
 
-PATH = "saved_models/pilot_model.pkl"
+PATH = "./saved_models/pilot_model.pkl"
 
 if load_pretrained_full_pilot:
     checkpoint = torch.load(PATH)
