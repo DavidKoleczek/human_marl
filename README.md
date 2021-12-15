@@ -1,4 +1,5 @@
 # On Optimizing Interventions in Shared Autonomy
+## Demo code available [here](https://github.com/DavidKoleczek/hitl_demo)!
 
 # Code Structure
 * Main executable scripts are in the `experiments` folder, start here!
