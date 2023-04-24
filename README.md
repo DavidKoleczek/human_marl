@@ -21,5 +21,5 @@ High level installation steps:
 6. The [following line of code](https://github.com/cpnota/autonomous-learning-library/blob/31e5aa9d85b4f1d1ad386b8e87c7d09fd8d31302/all/experiments/writer.py#L25) in ALL must be changed to something that doesn't use a colon in the file name such as `current_time = datetime.now().strftime('%Y-%m-%d %H-%M-%S %f')`
 7. Install the library code as a package `pip install --editable .`
 8. For development, we recommended `pip install autopep8` for automatic code formatting and `pip install pylint` for code analysis
-9. Installation of [ALL](https://github.com/cpnota/autonomous-learning-library) required a manual download of [swig](http://www.swig.org/download.html), adding the folder to path, and then `pip install autonomous-learning-library`
+9. Installation of [ALL](https://github.com/cpnota/autonomous-learning-library) required a manual download of [swig](http://www.swig.org/download.html), adding the folder to path, and then `pip install autonomous-learning-library==0.6.2`
 
