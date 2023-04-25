@@ -21,13 +21,10 @@ max_ep_len = 1000
 n_training_episodes = 500
 max_timesteps = max_ep_len * n_training_episodes
 
-# If true, load the pretrained model. If false, train the model from the scratch.
-load_pretrained_full_pilot = True
-
 env = make_env(using_lander_reward_shaping=True)
 
 agent = DDQN_agent(
-    device="cuda",
+    device="cpu",
     discount_factor=0.99,
     last_frame=max_timesteps,
     lr=1e-3,
@@ -77,7 +74,7 @@ pilot_policy = NoisyPilotPolicy(exp_pilot._agent.policy)
 # pilot_policy = noop_pilot_policy
 #pilot_policy = sensor_pilot_policy
 
-load_pretrained_co_pilot = True
+load_pretrained_co_pilot = False
 PATH = "./saved_models/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
 #PATH = "saved_models/" + pilot_name + "_0.5_alpha_" + str(alpha) + ".pkl"
 
@@ -86,7 +83,7 @@ print(PATH)
 co_env = make_co_env(pilot_policy=pilot_policy, using_lander_reward_shaping=True)
 
 co_agent = co_DDQN_agent(
-    device="cuda",
+    device="cpu",
     discount_factor=0.99,
     last_frame=max_timesteps,
     lr=1e-3,

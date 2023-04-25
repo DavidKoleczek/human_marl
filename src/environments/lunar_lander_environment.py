@@ -76,8 +76,8 @@ def make_co_env(pilot_policy, using_lander_reward_shaping=False):
         done = state.done
         info = {}
 
-        pilot_action = onehot_encode(self.pilot_policy(state))
-        obs = np.concatenate((obs, pilot_action))
+        # pilot_action = onehot_encode(self.pilot_policy(state))
+        # obs = np.concatenate((obs, pilot_action))
         return obs
 
     env.unwrapped.step = types.MethodType(_step, env.unwrapped)
