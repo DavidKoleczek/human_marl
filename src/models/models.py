@@ -151,41 +151,6 @@ def super_mario_nature_ddqn(env):
         nn.Linear(512, env.action_space.n),
     )
 
-# def super_mario_co_ddqn(env):
-#     class Super_Mario_CoNet(nn.Module):
-#         def __init__(self):
-#             super().__init__()
-
-#             self.conv1 = nn.Conv2d(env.observation_space.shape[0], 32, 3, stride=2, padding=1)
-#             self.conv2 = nn.Conv2d(32, 32, 3, stride=2, padding=1)
-#             self.conv3 = nn.Conv2d(32, 32, 3, stride=2, padding=1)
-#             self.conv4 = nn.Conv2d(32, 32, 3, stride=2, padding=1)
-#             self.flatten = nn.Flatten()
-#             self.linear1 = nn.Linear(32 * 6 * 6, 512)
-#             self.linear2 = nn.Linear(512 + 12, 128)
-#             self.linear3 = nn.Linear(128, 64)
-#             self.linear4 = nn.Linear(64, env.action_space.n)
-
-
-
-#         def forward(self, pixel_state, action_state):
-#             pixel_state = F.relu(self.conv1(pixel_state))
-#             pixel_state = F.relu(self.conv2(pixel_state))
-#             pixel_state = F.relu(self.conv3(pixel_state))
-#             pixel_state = F.relu(self.conv4(pixel_state))
-#             pixel_state = self.flatten(pixel_state)
-#             pixel_state = F.relu(self.linear1(pixel_state))
-            
-#             state = torch.cat((pixel_state, action_state), dim=1)
-
-#             state = F.relu(self.linear2(state))
-#             state = F.relu(self.linear3(state))
-#             state = self.linear4(state)
-#             return state
-
-#     return Super_Mario_CoNet()
-
-
 class super_mario_co_ddqn(nn.Module):
     def __init__(self):
         super().__init__()

@@ -76,7 +76,6 @@ pilot_policy = NoisyPilotPolicy(exp_pilot._agent.policy)
 
 load_pretrained_co_pilot = False
 PATH = "./saved_models/intervention_penalty/" + pilot_name + "_alpha_" + str(alpha) + ".pkl"
-#PATH = "saved_models/" + pilot_name + "_0.5_alpha_" + str(alpha) + ".pkl"
 
 print(PATH)
 
